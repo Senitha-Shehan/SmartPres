@@ -1,0 +1,15 @@
+[
+  "divider",
+  "divider-horizontal",
+  "divider-vertical",
+  "divider-neutral",
+  "divider-primary",
+  "divider-secondary",
+  "divider-accent",
+  "divider-success",
+  "divider-warning",
+  "divider-info",
+  "divider-error",
+  "divider-start",
+  "divider-end"
+]

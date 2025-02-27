@@ -1,0 +1,16 @@
+[
+  "status",
+  "status-primary",
+  "status-secondary",
+  "status-accent",
+  "status-neutral",
+  "status-info",
+  "status-success",
+  "status-warning",
+  "status-error",
+  "status-xs",
+  "status-sm",
+  "status-md",
+  "status-lg",
+  "status-xl"
+]

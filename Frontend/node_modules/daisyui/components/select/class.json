@@ -1,0 +1,17 @@
+[
+  "select",
+  "select-ghost",
+  "select-neutral",
+  "select-primary",
+  "select-secondary",
+  "select-accent",
+  "select-info",
+  "select-success",
+  "select-warning",
+  "select-error",
+  "select-xs",
+  "select-sm",
+  "select-md",
+  "select-lg",
+  "select-xl"
+]

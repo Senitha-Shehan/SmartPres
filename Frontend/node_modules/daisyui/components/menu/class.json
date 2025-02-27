@@ -1,0 +1,19 @@
+[
+  "menu",
+  "menu-dropdown",
+  "menu-title",
+  "menu-active",
+  "menu-focus",
+  "badge",
+  "menu-disabled",
+  "dropdown",
+  "menu-dropdown-toggle",
+  "dropdown-content",
+  "menu-horizontal",
+  "menu-vertical",
+  "menu-xs",
+  "menu-sm",
+  "menu-md",
+  "menu-lg",
+  "menu-xl"
+]
