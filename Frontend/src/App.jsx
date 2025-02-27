@@ -1,12 +1,18 @@
 import React from "react";
 import NavBar from "./Other/NavBar";
-import Login from "./Components/Login/Login.jsx"
+import { Routes } from "react-router-dom";
+import { Route } from "react-router-dom";
+import Login from "./Components/Login/Login";
 
 const App = () => {
   return (
     <div>
       <NavBar />
-      <Login/>
+      <main>
+        <Routes>
+          <Route path="/Login" element={<Login />} />
+        </Routes>
+      </main>
     </div>
   );
 };
