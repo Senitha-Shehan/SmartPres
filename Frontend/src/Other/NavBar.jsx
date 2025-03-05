@@ -1,14 +1,9 @@
 import React, { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 
 const Navbar = () => {
-  const [theme, setTheme] = useState(localStorage.getItem("theme") || "light");
   const [isOpen, setIsOpen] = useState(false);
-
-  useEffect(() => {
-    document.documentElement.setAttribute("data-theme", theme);
-    localStorage.setItem("theme", theme);
-  }, [theme]);
+  const location = useLocation(); // Get the current route
 
   // Close sidebar when clicking outside or pressing ESC key
   useEffect(() => {
@@ -19,6 +14,48 @@ const Navbar = () => {
     document.addEventListener("keydown", handleKeyDown);
     return () => document.removeEventListener("keydown", handleKeyDown);
   }, []);
+
+  // Define sidebar menus
+  const userMenu = [
+    { path: "/Home", icon: "🏠", label: "Homepage" },
+    { path: "/AddUser", icon: "📋", label: "Student Registration" },
+    { path: "/UserDetails", icon: "📄", label: "Student List" },
+  ];
+
+  const examinerMenu = [
+    { path: "/Home", icon: "🏠", label: "Upcoming Presentation" },
+    { path: "/AddUser", icon: "📋", label: "Evalutaion Presentaion" },
+  ];
+
+  const adminMenu = [
+    { path: "/AddModules", icon: "📊", label: "Modules" },
+    { path: "/admin/manage-users", icon: "👥", label: "Examiner" },
+  ];
+
+  const licMenu = [
+    { path: "/lic/dashboard", icon: "📚", label: "Schedule Presentaion" },
+    { path: "/lic/courses", icon: "📖", label: "Report & ______" },
+  ];
+
+  const studentMenu = [
+    { path: "/student/courses", icon: "📘", label: "Upcoming Presentaion" },
+    { path: "/student/assignments", icon: "📝", label: "Group Registration" },
+    { path: "/student/results", icon: "🎓", label: "Evaluation Results" },
+  ];
+
+  // Determine which menu to display based on route
+  let menuItems;
+  if (location.pathname.startsWith("/Admin-Dashboard")) {
+    menuItems = adminMenu;
+  } else if (location.pathname.startsWith("/Lic-Dashboard")) {
+    menuItems = licMenu;
+  } else if (location.pathname.startsWith("/student-dashboard")) {
+    menuItems = studentMenu;
+  } else if (location.pathname.startsWith("/Examiner-Dashboard")) {
+    menuItems = examinerMenu;
+  } else {
+    menuItems = userMenu;
+  }
 
   return (
     <>
@@ -52,7 +89,7 @@ const Navbar = () => {
           <span className="text-2xl font-bold">SmartPres</span>
         </div>
 
-        {/* Navbar End - Icons & Theme Switcher */}
+        {/* Navbar End - Icons */}
         <div className="navbar-end flex items-center gap-3">
           {/* Search Icon */}
           <button className="btn btn-ghost btn-circle">
@@ -92,16 +129,6 @@ const Navbar = () => {
               <span className="badge badge-xs badge-primary indicator-item"></span>
             </div>
           </button>
-
-          {/* Theme Switcher */}
-          <select
-            className="select select-bordered w-24"
-            value={theme}
-            onChange={(e) => setTheme(e.target.value)}
-          >
-            <option value="light">Light</option>
-            <option value="dark">Dark</option>
-          </select>
         </div>
       </div>
 
@@ -129,22 +156,19 @@ const Navbar = () => {
         </div>
 
         {/* Sidebar Menu */}
-        <ul className="menu mt-5">
-          <li>
-            <Link to="/Home" onClick={() => setIsOpen(false)}>
-              🏠 Homepage
-            </Link>
-          </li>
-          <li>
-            <Link to="/AddUser" onClick={() => setIsOpen(false)}>
-              📋 Student Registration
-            </Link>
-          </li>
-          <li>
-            <Link to="/UserDetails" onClick={() => setIsOpen(false)}>
-              📄 Student List
-            </Link>
-          </li>
+        <ul className="menu p-4 w-full text-base-content">
+          {menuItems.map((item) => (
+            <li key={item.path} className="mb-2">
+              <Link
+                to={item.path}
+                onClick={() => setIsOpen(false)}
+                className="flex items-center p-3 rounded-lg transition-all hover:bg-primary hover:text-white"
+              >
+                <span className="text-lg">{item.icon}</span>
+                <span className="ml-2">{item.label}</span>
+              </Link>
+            </li>
+          ))}
         </ul>
       </div>
     </>
