@@ -20,16 +20,13 @@ app.use(cors());
 //middleware
 app.use(express.json());
 
-<<<<<<< Updated upstream
 //Presentation routes
 app.use("/api/presentations", presentationRoutes);
 app.use("/api/examiners", examinerRoutes);
-=======
 
 
 app.use("/api", moduleRoutes);
 app.use("/api", groupRoutes);
->>>>>>> Stashed changes
 
 
 mongoose.connect(process.env.MONGO_URI)
