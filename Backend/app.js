@@ -5,13 +5,10 @@ const dotenv = require("dotenv");
 
 require("dotenv").config();
 
-<<<<<<< Updated upstream
 const presentationRoutes = require("./Route/presentationSchedule.route");
 const examinerRoutes = require("./Route/examiner.route");
-=======
 const moduleRoutes = require("./Route/modelRoutes");
 const groupRoutes = require("./Route/groupRoutes");
->>>>>>> Stashed changes
 
 const app = express();
 const cors = require("cors");
