@@ -7,8 +7,8 @@ require("dotenv").config();
 
 const presentationRoutes = require("./Route/presentationSchedule.route");
 const examinerRoutes = require("./Route/examiner.route");
-const moduleRoutes = require("./Route/modelRoutes");
-const groupRoutes = require("./Route/groupRoutes");
+const moduleRoutes = require("./Route/model.route");
+const groupRoutes = require("./Route/group.route");
 
 const app = express();
 const cors = require("cors");

@@ -1,4 +1,4 @@
-const Module = require("../Model/Module");
+const Module = require("../Model/Module.model");
 
 // Create a new module
 exports.createModule = async (req, res) => {
