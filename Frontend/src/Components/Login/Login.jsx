@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 
 const predefinedUsers = [
@@ -12,7 +12,12 @@ const Login = () => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
+  const [theme, setTheme] = useState("light");
   const navigate = useNavigate();
+
+  useEffect(() => {
+    document.documentElement.setAttribute("data-theme", theme);
+  }, [theme]);
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -22,13 +27,13 @@ const Login = () => {
     if (user) {
       switch (user.role) {
         case "admin":
-          navigate("/admin-dashboard");
+          navigate("/Admin-Dashboard");
           break;
         case "lic":
-          navigate("/lic-dashboard");
+          navigate("/Lic-Dashboard");
           break;
         case "examiner":
-          navigate("/examiner-dashboard");
+          navigate("/Examiner-Dashboard");
           break;
         case "student":
           navigate("/student-dashboard");
@@ -42,38 +47,37 @@ const Login = () => {
   };
 
   return (
-    <div className="flex items-center justify-center h-screen bg-gray-100">
-      <div className="bg-white shadow-lg rounded-lg p-8 w-96">
-        <h2 className="text-2xl font-semibold text-center text-gray-700 mb-4">Login</h2>
+    <div className="flex flex-col items-center justify-center h-screen bg-base-100">
+
+      <div className="bg-base-200 shadow-lg rounded-lg p-8 w-96">
+        <h2 className="text-2xl font-semibold text-center text-primary mb-4">Login</h2>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label className="block text-gray-600">Username:</label>
+            <label className="block text-base-content">Username:</label>
             <input
               type="text"
               value={username}
               onChange={(e) => setUsername(e.target.value)}
               required
-              className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400"
+              className="w-full input input-bordered"
             />
           </div>
           <div>
-            <label className="block text-gray-600">Password:</label>
+            <label className="block text-base-content">Password:</label>
             <input
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required
-              className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400"
+              className="w-full input input-bordered"
             />
           </div>
-          {error && <p className="text-red-500 text-sm">{error}</p>}
-          <button
-            type="submit"
-            className="w-full bg-blue-500 text-white py-2 rounded-md hover:bg-blue-600 transition"
-          >
+          {error && <p className="text-error text-sm">{error}</p>}
+          <button type="submit" className="w-full btn btn-primary">
             Login
           </button>
         </form>
+        
       </div>
     </div>
   );
