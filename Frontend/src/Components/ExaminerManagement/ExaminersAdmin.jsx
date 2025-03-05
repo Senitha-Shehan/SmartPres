@@ -9,7 +9,7 @@ const ExaminerAdmin = () => {
 
     const fetchExaminers = async () => {
         try {
-            const response = await fetch("http://localhost:5000/api/examiners"); // Adjust if needed
+            const response = await fetch("http://localhost:5000/api/examiners");
             const data = await response.json();
             setExaminers(data);
         } catch (error) {
