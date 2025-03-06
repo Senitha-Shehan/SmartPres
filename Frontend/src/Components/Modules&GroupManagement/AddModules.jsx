@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import axios from "axios";
+import api from "../../lib/axios";
 
 const AddModules = () => {
   const [formData, setFormData] = useState({
@@ -18,7 +18,7 @@ const AddModules = () => {
 
   const fetchModules = async () => {
     try {
-      const response = await axios.get("http://localhost:5000/api/modules");
+      const response = await api.get("/api/modules");
       setModules(response.data);
     } catch (error) {
       console.error("Error fetching modules", error);
@@ -34,10 +34,10 @@ const AddModules = () => {
     e.preventDefault();
     try {
       if (editId) {
-        await axios.put(`http://localhost:5000/api/modules/${editId}`, formData);
+        await api.put(`/api/modules/${editId}`, formData);
         setMessage("Module updated successfully");
       } else {
-        await axios.post("http://localhost:5000/api/modules", formData);
+        await api.post("/api/modules", formData);
         setMessage("Module added successfully");
       }
       setFormData({ year: "", semester: "", moduleCode: "", moduleName: "" });
@@ -55,7 +55,7 @@ const AddModules = () => {
 
   const handleDelete = async (id) => {
     try {
-      await axios.delete(`http://localhost:5000/api/modules/${id}`);
+      await api.delete(`/api/modules/${id}`);
       setMessage("Module deleted successfully");
       fetchModules();
     } catch (error) {
