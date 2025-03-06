@@ -2,19 +2,17 @@
 const express = require("express");
 const mongoose = require("mongoose");
 const dotenv = require("dotenv");
+const cors = require("cors");
 
 require("dotenv").config();
 
 const presentationRoutes = require("./Route/presentationSchedule.route");
 const examinerRoutes = require("./Route/examiner.route");
-const moduleRoutes = require("./Route/modelRoutes");
-const groupRoutes = require("./Route/groupRoutes");
+const moduleRoutes = require("./Route/model.route");
+const groupRoutes = require("./Route/group.route");
 
 const app = express();
-const cors = require("cors");
 app.use(cors());
-
-//middleware
 app.use(express.json());
 
 //Presentation routes
@@ -22,8 +20,8 @@ app.use("/api/presentations", presentationRoutes);
 app.use("/api/examiners", examinerRoutes);
 
 
-app.use("/api", moduleRoutes);
-app.use("/api", groupRoutes);
+app.use("/api/modules", moduleRoutes);
+app.use("/api/groups", groupRoutes);
 
 
 mongoose.connect(process.env.MONGO_URI)

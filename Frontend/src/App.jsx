@@ -10,6 +10,7 @@ import ExaminerDashboard from "./Components/Dashboards/ExaminerDashboard";
 import LicDashboard from "./Components/Dashboards/LicDashboard";
 import StudentDashboard from "./Components/Dashboards/StudentDashboard";
 import AddModules from "./Components/Modules&GroupManagement/AddModules";
+
 const App = () => {
   return (
     <div className="flex flex-col min-h-screen">
@@ -18,7 +19,12 @@ const App = () => {
       <main className="flex-grow p-6">
         <Routes>
           <Route path="/Login" element={<Login />} />
+
           <Route path="/ExaminerAdmin" element={<ExaminerAdmin/>} />
+
+
+
+          <Route path="/ExaminerAdmin" element={<ExaminerAdmin />} />
 
           <Route path="/Admin-Dashboard" element={<AdminDashboard />} />
           <Route path="/Examiner-Dashboard" element={<ExaminerDashboard />} />
