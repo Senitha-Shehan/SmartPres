@@ -3,7 +3,6 @@ import NavBar from "./Other/NavBar";
 import Footer from "./Other/Footer";
 import { Routes, Route } from "react-router-dom";
 import Login from "./Components/Login/Login";
-
 import ExaminerAdmin from "./Components/ExaminerManagement/ExaminersAdmin";
 
 import AdminDashboard from "./Components/Dashboards/AdminDashboard";
@@ -20,6 +19,10 @@ const App = () => {
       <main className="flex-grow p-6">
         <Routes>
           <Route path="/Login" element={<Login />} />
+
+          <Route path="/ExaminerAdmin" element={<ExaminerAdmin/>} />
+
+
 
           <Route path="/ExaminerAdmin" element={<ExaminerAdmin />} />
 
