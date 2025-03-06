@@ -47,37 +47,49 @@ const Login = () => {
   };
 
   return (
-    <div className="flex flex-col items-center justify-center h-screen bg-base-100">
-
-      <div className="bg-base-200 shadow-lg rounded-lg p-8 w-96">
-        <h2 className="text-2xl font-semibold text-center text-primary mb-4">Login</h2>
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div>
-            <label className="block text-base-content">Username:</label>
+    <div
+      className="flex items-center justify-center h-screen bg-white"
+      style={{ backgroundSize: "cover", backgroundPosition: "center" }}
+    >
+      <div className="bg-white p-8 rounded-lg shadow-lg max-w-md w-full">
+        <h2 className="text-3xl font-bold text-center text-gray-700 mb-6">Login</h2>
+        <form onSubmit={handleSubmit} className="space-y-6">
+          <div className="flex flex-col">
+            <label htmlFor="username" className="text-gray-600 text-sm mb-1">
+              Username
+            </label>
             <input
+              id="username"
               type="text"
               value={username}
               onChange={(e) => setUsername(e.target.value)}
               required
-              className="w-full input input-bordered"
+              className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400"
+              placeholder="Enter your username"
             />
           </div>
-          <div>
-            <label className="block text-base-content">Password:</label>
+          <div className="flex flex-col">
+            <label htmlFor="password" className="text-gray-600 text-sm mb-1">
+              Password
+            </label>
             <input
+              id="password"
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required
-              className="w-full input input-bordered"
+              className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400"
+              placeholder="Enter your password"
             />
           </div>
-          {error && <p className="text-error text-sm">{error}</p>}
-          <button type="submit" className="w-full btn btn-primary">
+          {error && <p className="text-red-500 text-sm text-center">{error}</p>}
+          <button
+            type="submit"
+            className="w-full py-3 bg-blue-500 text-white font-semibold rounded-lg shadow-md hover:bg-blue-600 transition duration-300"
+          >
             Login
           </button>
         </form>
-        
       </div>
     </div>
   );
