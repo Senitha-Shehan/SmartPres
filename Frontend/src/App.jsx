@@ -4,6 +4,7 @@ import Footer from "./Other/Footer";
 import { Routes, Route } from "react-router-dom";
 import Login from "./Components/Login/Login";
 import ExaminerAdmin from "./Components/ExaminerManagement/ExaminersAdmin";
+import PresentationSchedule from "./Components/PresentationScheduleManagement/PresentationSchdule"
 
 import AdminDashboard from "./Components/Dashboards/AdminDashboard";
 import ExaminerDashboard from "./Components/Dashboards/ExaminerDashboard";
@@ -24,7 +25,7 @@ const App = () => {
 
 
 
-          <Route path="/ExaminerAdmin" element={<ExaminerAdmin />} />
+          <Route path="/PresentationSchedule" element={<PresentationSchedule />} />
 
           <Route path="/Admin-Dashboard" element={<AdminDashboard />} />
           <Route path="/Examiner-Dashboard" element={<ExaminerDashboard />} />

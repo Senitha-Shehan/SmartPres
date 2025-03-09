@@ -9,6 +9,8 @@ const ExaminerAdmin = () => {
         module: "",
         email: "",
     });
+    const [message, setMessage] = useState("");
+    const [editId, setEditId] = useState(null);
 
     useEffect(() => {
         fetchExaminers();
@@ -34,103 +36,136 @@ const ExaminerAdmin = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
-            await api.post("/api/examiners", formData); // Send POST request to add examiner
-            fetchExaminers(); // Re-fetch the examiners list after adding
+            if (editId) {
+                await api.put(`/api/examiners/${editId}`, formData);
+                setMessage("Examiner updated successfully");
+            } else {
+                await api.post("/api/examiners", formData);
+                setMessage("Examiner added successfully");
+            }
             setFormData({
                 examinerID: "",
                 name: "",
                 module: "",
                 email: "",
-            }); // Reset the form
+            });
+            setEditId(null);
+            fetchExaminers();
         } catch (error) {
-            console.error("Error adding examiner:", error);
+            setMessage(error.response?.data?.error || "Something went wrong");
+        }
+    };
+
+    const handleEdit = (examiner) => {
+        setFormData(examiner);
+        setEditId(examiner._id);
+    };
+
+    const handleDelete = async (id) => {
+        try {
+            await api.delete(`/api/examiners/${id}`);
+            setMessage("Examiner deleted successfully");
+            fetchExaminers();
+        } catch (error) {
+            console.error("Error deleting examiner:", error);
         }
     };
 
     return (
-        <div className="p-5">
-            <h2 className="text-xl font-bold mb-4">Examiner List</h2>
-
-            {/* Form to add a new examiner */}
-            <form onSubmit={handleSubmit} className="mb-4">
-                <h3 className="text-lg font-semibold">Add New Examiner</h3>
-                <div className="mb-4">
-                    <label className="block text-sm font-medium mb-1">Examiner ID</label>
+        <div className="max-w-7xl mx-auto mt-25 p-8 bg-white shadow-lg rounded-lg border border-gray-300">
+            <h2 className="text-3xl font-bold mb-6 text-gray-900 text-center">
+                {editId ? "Edit Examiner" : "Add Examiner"}
+            </h2>
+            {message && <p className="mb-4 text-green-600 font-medium text-center">{message}</p>}
+            <form onSubmit={handleSubmit} className="space-y-4">
+                <div className="grid grid-cols-2 gap-4">
                     <input
                         type="text"
                         name="examinerID"
+                        placeholder="Examiner ID"
                         value={formData.examinerID}
                         onChange={handleInputChange}
-                        className="border p-2 w-full"
+                        className="w-full p-3 border rounded-lg bg-gray-100"
                         required
                     />
-                </div>
-                <div className="mb-4">
-                    <label className="block text-sm font-medium mb-1">Name</label>
                     <input
                         type="text"
                         name="name"
+                        placeholder="Name"
                         value={formData.name}
                         onChange={handleInputChange}
-                        className="border p-2 w-full"
+                        className="w-full p-3 border rounded-lg bg-gray-100"
                         required
                     />
                 </div>
-                <div className="mb-4">
-                    <label className="block text-sm font-medium mb-1">Module</label>
+                <div className="grid grid-cols-2 gap-4">
                     <input
                         type="text"
                         name="module"
+                        placeholder="Module"
                         value={formData.module}
                         onChange={handleInputChange}
-                        className="border p-2 w-full"
+                        className="w-full p-3 border rounded-lg bg-gray-100"
                         required
                     />
-                </div>
-                <div className="mb-4">
-                    <label className="block text-sm font-medium mb-1">Email</label>
                     <input
                         type="email"
                         name="email"
+                        placeholder="Email"
                         value={formData.email}
                         onChange={handleInputChange}
-                        className="border p-2 w-full"
+                        className="w-full p-3 border rounded-lg bg-gray-100"
                         required
                     />
                 </div>
-                <button type="submit" className="bg-blue-500 text-white p-2 rounded">
-                    Add Examiner
+                <button
+                    type="submit"
+                    className="w-full bg-blue-600 hover:bg-blue-700 text-white p-3 rounded-lg font-medium transition duration-300"
+                >
+                    {editId ? "Update Examiner" : "Add Examiner"}
                 </button>
             </form>
 
-            <table className="w-full border-collapse border border-gray-300">
-                <thead>
-                    <tr className="bg-gray-200">
-                        <th className="border p-2">Examiner ID</th>
-                        <th className="border p-2">Name</th>
-                        <th className="border p-2">Module</th>
-                        <th className="border p-2">Email</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {examiners.length > 0 ? (
-                        examiners.map((examiner) => (
-                            <tr key={examiner._id} className="text-center">
-                                <td className="border p-2">{examiner.examinerID}</td>
-                                <td className="border p-2">{examiner.name}</td>
-                                <td className="border p-2">{examiner.module}</td>
-                                <td className="border p-2">{examiner.email}</td>
-                            </tr>
-                        ))
-                    ) : (
-                        <tr>
-                            <td colSpan="4" className="border p-2 text-center">
-                                No examiners found.
-                            </td>
+            <h3 className="text-2xl font-semibold mt-10 text-center">Examiner List</h3>
+            <div className="overflow-x-auto mt-6">
+                <table className="table w-full border border-gray-300 rounded-lg shadow-md">
+                    <thead>
+                        <tr className="bg-blue-100">
+                            <th></th>
+                            <th>Examiner ID</th>
+                            <th>Name</th>
+                            <th>Module</th>
+                            <th>Email</th>
+                            <th>Actions</th>
                         </tr>
-                    )}
-                </tbody>
-            </table>
+                    </thead>
+                    <tbody>
+                        {examiners.map((examiner, index) => (
+                            <tr key={examiner._id} className="hover:bg-gray-100 transition duration-200">
+                                <th>{index + 1}</th>
+                                <td className="text-center">{examiner.examinerID}</td>
+                                <td className="text-center">{examiner.name}</td>
+                                <td className="text-center">{examiner.module}</td>
+                                <td className="text-center">{examiner.email}</td>
+                                <td className="text-center flex justify-center space-x-2">
+                                    <button
+                                        onClick={() => handleEdit(examiner)}
+                                        className="bg-blue-500 hover:bg-blue-700 text-white px-3 py-1 rounded-lg transition duration-300"
+                                    >
+                                        Edit
+                                    </button>
+                                    <button
+                                        onClick={() => handleDelete(examiner._id)}
+                                        className="bg-red-500 hover:bg-red-700 text-white px-3 py-1 rounded-lg transition duration-300"
+                                    >
+                                        Delete
+                                    </button>
+                                </td>
+                            </tr>
+                        ))}
+                    </tbody>
+                </table>
+            </div>
         </div>
     );
 };
