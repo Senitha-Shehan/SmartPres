@@ -76,6 +76,7 @@ const ExaminerAdmin = () => {
             <h2 className="text-3xl font-bold mb-6 text-gray-900 text-center">
                 {editId ? "Edit Examiner" : "Add Examiner"}
             </h2>
+            <h1>Matheesha</h1>
             {message && <p className="mb-4 text-green-600 font-medium text-center">{message}</p>}
             <form onSubmit={handleSubmit} className="space-y-4">
                 <div className="grid grid-cols-2 gap-4">
