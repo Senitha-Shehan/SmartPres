@@ -13,11 +13,21 @@ const Login = () => {
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [theme, setTheme] = useState("light");
+  const [toastMessage, setToastMessage] = useState("");
   const navigate = useNavigate();
 
   useEffect(() => {
     document.documentElement.setAttribute("data-theme", theme);
   }, [theme]);
+
+  useEffect(() => {
+    if (toastMessage) {
+      const timer = setTimeout(() => {
+        setToastMessage(""); // Hide toast after 3 seconds
+      }, 3000);
+      return () => clearTimeout(timer);
+    }
+  }, [toastMessage]);
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -25,30 +35,34 @@ const Login = () => {
       (user) => user.username === username && user.password === password
     );
     if (user) {
-      switch (user.role) {
-        case "admin":
-          navigate("/Admin-Dashboard");
-          break;
-        case "lic":
-          navigate("/Lic-Dashboard");
-          break;
-        case "examiner":
-          navigate("/Examiner-Dashboard");
-          break;
-        case "student":
-          navigate("/student-dashboard");
-          break;
-        default:
-          navigate("/");
-      }
+      setToastMessage(`Welcome ${user.username}!`);
+      setTimeout(() => {
+        switch (user.role) {
+          case "admin":
+            navigate("/Admin-Dashboard");
+            break;
+          case "lic":
+            navigate("/Lic-Dashboard");
+            break;
+          case "examiner":
+            navigate("/Examiner-Dashboard");
+            break;
+          case "student":
+            navigate("/student-dashboard");
+            break;
+          default:
+            navigate("/");
+        }
+      }, 1000); // Delay to show toast before redirecting
     } else {
       setError("Invalid credentials");
+      setToastMessage("Login failed. Invalid credentials.");
     }
   };
 
   return (
     <div
-      className="flex items-center justify-center h-screen bg-white"
+      className="flex items-center justify-center h-screen bg-gray-30"
       style={{ backgroundSize: "cover", backgroundPosition: "center" }}
     >
       <div className="bg-white p-8 rounded-lg shadow-lg max-w-md w-full">
@@ -91,6 +105,12 @@ const Login = () => {
           </button>
         </form>
       </div>
+
+      {toastMessage && (
+        <div className="fixed bottom-5 left-1/2 transform -translate-x-1/2 bg-blue-500 text-white p-3 rounded-lg shadow-lg z-50 transition-all duration-300">
+          <p>{toastMessage}</p>
+        </div>
+      )}
     </div>
   );
 };

@@ -3,31 +3,36 @@ import { Link } from "react-router-dom";
 
 const AdminDashboard = () => {
   return (
-    <div className="p-6 flex flex-col items-center min-h-screen bg-white-100">
-      <h1 className="text-4xl font-bold mb-6 underline">Admin Dashboard</h1>
-      <div className="flex flex-col gap-6 w-full max-w-6xl items-center">
+    <div className="min-h-screen bg-gray-50 flex flex-col items-center p-8">
+      <h1 className="text-5xl font-bold text-gray-900 mb-12">Admin Dashboard</h1>
+      
+      <div className="flex flex-col gap-8 w-full max-w-lg">
         {/* Modules Card */}
-        <div className="card bg-base-100 shadow-xl w-full max-w-md h-64 flex flex-col justify-between">
-          <div className="card-body">
-            <h2 className="card-title">Modules</h2>
-            <p>Manage and configure academic modules.</p>
+        <div className="bg-white shadow-lg rounded-lg p-8 h-64 flex flex-col justify-between">
+          <div>
+            <h2 className="text-3xl font-semibold text-gray-800">Modules</h2>
+            <p className="text-gray-600 mt-3 text-lg">Manage and configure academic modules.</p>
           </div>
-          <div className="card-actions justify-end p-4">
+          <div className="mt-4">
             <Link to="/AddModules">
-              <button className="btn btn-soft btn-primary">Manage Modules</button>
+              <button className="w-full bg-blue-600 text-white py-3 rounded-lg text-lg hover:bg-blue-700 transition duration-300">
+                Manage Modules
+              </button>
             </Link>
           </div>
         </div>
 
         {/* Examiner Card */}
-        <div className="card bg-base-100 shadow-xl w-full max-w-md h-64 flex flex-col justify-between">
-          <div className="card-body">
-            <h2 className="card-title">Examiner</h2>
-            <p>Oversee and schedule examiner tasks.</p>
+        <div className="bg-white shadow-lg rounded-lg p-8 h-64 flex flex-col justify-between">
+          <div>
+            <h2 className="text-3xl font-semibold text-gray-800">Examiner</h2>
+            <p className="text-gray-600 mt-3 text-lg">Oversee and schedule examiner tasks.</p>
           </div>
-          <div className="card-actions justify-end p-4">
-            <Link to="/AddModules">
-              <button className="btn btn-soft btn-secondary">Manage Examiner</button>
+          <div className="mt-4">
+            <Link to="/examineradmin">
+              <button className="w-full bg-green-600 text-white py-3 rounded-lg text-lg hover:bg-green-700 transition duration-300">
+                Manage Examiner
+              </button>
             </Link>
           </div>
         </div>

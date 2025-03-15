@@ -92,7 +92,7 @@ const Navbar = () => {
         {/* Navbar End - Icons */}
         <div className="navbar-end flex items-center gap-3">
           {/* Search Icon */}
-          <button className="btn btn-ghost btn-circle">
+          {/* <button className="btn btn-ghost btn-circle">
             <svg
               xmlns="http://www.w3.org/2000/svg"
               className="h-5 w-5"
@@ -107,10 +107,10 @@ const Navbar = () => {
                 d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
               />
             </svg>
-          </button>
+          </button> */}
 
           {/* Notification Icon */}
-          <button className="btn btn-ghost btn-circle">
+          {/* <button className="btn btn-ghost btn-circle">
             <div className="indicator">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -128,14 +128,14 @@ const Navbar = () => {
               </svg>
               <span className="badge badge-xs badge-primary indicator-item"></span>
             </div>
-          </button>
+          </button> */}
         </div>
       </div>
 
       {/* Sidebar with Backdrop */}
       {isOpen && (
         <div
-          className="fixed inset-0 bg-black bg-opacity-50 z-40"
+          className="fixed inset-0 backdrop-brightness-75 bg-opacity-50 z-40"
           onClick={() => setIsOpen(false)}
         ></div>
       )}
