@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import api from "../../lib/axios";
+// import jsPDF from "jspdf";
 
 const AddModules = () => {
   const [formData, setFormData] = useState({
@@ -9,8 +10,8 @@ const AddModules = () => {
     moduleName: "",
   });
   const [modules, setModules] = useState([]);
-  const [message, setMessage] = useState("");
   const [editId, setEditId] = useState(null);
+  const [search, setSearch] = useState("");
 
   useEffect(() => {
     fetchModules();
@@ -35,16 +36,14 @@ const AddModules = () => {
     try {
       if (editId) {
         await api.put(`/api/modules/${editId}`, formData);
-        setMessage("Module updated successfully");
       } else {
         await api.post("/api/modules", formData);
-        setMessage("Module added successfully");
       }
       setFormData({ year: "", semester: "", moduleCode: "", moduleName: "" });
       setEditId(null);
       fetchModules();
     } catch (error) {
-      setMessage(error.response?.data?.error || "Something went wrong");
+      console.error("Error saving module", error);
     }
   };
 
@@ -56,58 +55,145 @@ const AddModules = () => {
   const handleDelete = async (id) => {
     try {
       await api.delete(`/api/modules/${id}`);
-      setMessage("Module deleted successfully");
       fetchModules();
     } catch (error) {
       console.error("Error deleting module", error);
     }
   };
 
-  return (
-    <div className="max-w-7xl mx-auto mt-25 p-8 bg-white shadow-lg rounded-lg border border-gray-300">
-      <h2 className="text-3xl font-bold mb-6 text-gray-900 text-center">
-        {editId ? "Edit Module" : "Add Module"}
-      </h2>
-      {message && <p className="mb-4 text-green-600 font-medium text-center">{message}</p>}
-      <form onSubmit={handleSubmit} className="space-y-4">
-        <div className="grid grid-cols-2 gap-4">
-          <input type="number" name="year" placeholder="Year (1-4)" value={formData.year} onChange={handleChange} className="w-full p-3 border rounded-lg bg-gray-100" required />
-          <input type="number" name="semester" placeholder="Semester (1-2)" value={formData.semester} onChange={handleChange} className="w-full p-3 border rounded-lg bg-gray-100" required />
-        </div>
-        <input type="text" name="moduleCode" placeholder="Module Code" value={formData.moduleCode} onChange={handleChange} className="w-full p-3 border rounded-lg bg-gray-100" required />
-        <input type="text" name="moduleName" placeholder="Module Name" value={formData.moduleName} onChange={handleChange} className="w-full p-3 border rounded-lg bg-gray-100" required />
-        <button type="submit" className="w-full bg-blue-600 hover:bg-blue-700 text-white p-3 rounded-lg font-medium transition duration-300">
-          {editId ? "Update Module" : "Add Module"}
-        </button>
-      </form>
+  const generateReport = () => {
+    const doc = new jsPDF();
+    doc.setFontSize(18);
+    doc.text("Module List Report", 20, 20);
+    doc.setFontSize(12);
+    let yPosition = 30;
 
-      <h3 className="text-2xl font-semibold mt-10 text-center">Module List</h3>
-      <div className="overflow-x-auto mt-6">
-        <table className="table w-full border border-gray-300 rounded-lg shadow-md">
+    doc.text("Year | Semester | Module Code | Module Name", 20, yPosition);
+    yPosition += 10;
+
+    modules.forEach((module) => {
+      doc.text(
+        `${module.year} | ${module.semester} | ${module.moduleCode} | ${module.moduleName}`,
+        20,
+        yPosition
+      );
+      yPosition += 10;
+    });
+
+    doc.save("module_report.pdf");
+  };
+
+  return (
+    <div className="container mx-auto p-8">
+      <h1 className="text-3xl font-bold text-center mb-6 text-gray-800">
+        Module Management
+      </h1>
+
+      {/* Add/Edit Module Form */}
+      <div className="bg-white shadow-lg rounded-lg p-6 mb-8">
+        <h2 className="text-xl font-semibold text-gray-700 mb-4">
+          Add or Edit Module
+        </h2>
+        <form
+          onSubmit={handleSubmit}
+          className="grid grid-cols-1 sm:grid-cols-2 gap-6"
+        >
+          <input
+            type="number"
+            name="year"
+            value={formData.year}
+            onChange={handleChange}
+            placeholder="Year"
+            className="border-2 border-gray-300 p-3 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            required
+          />
+          <input
+            type="number"
+            name="semester"
+            value={formData.semester}
+            onChange={handleChange}
+            placeholder="Semester"
+            className="border-2 border-gray-300 p-3 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            required
+          />
+          <input
+            type="text"
+            name="moduleCode"
+            value={formData.moduleCode}
+            onChange={handleChange}
+            placeholder="Module Code"
+            className="border-2 border-gray-300 p-3 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            required
+          />
+          <input
+            type="text"
+            name="moduleName"
+            value={formData.moduleName}
+            onChange={handleChange}
+            placeholder="Module Name"
+            className="border-2 border-gray-300 p-3 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            required
+          />
+          <button
+            type="submit"
+            className="btn btn-primary px-0 py-2 rounded-md sm:col-span-2"
+          >
+            {editId ? "Update Module" : "Add Module"}
+          </button>
+        </form>
+      </div>
+
+      {/* Module List */}
+      <div className="bg-white shadow-lg rounded-lg p-6">
+        <h2 className="text-xl font-semibold text-gray-700 mb-4">
+          Module List
+        </h2>
+        <div className="mb-4 flex items-center justify-between">
+          <input
+            type="text"
+            placeholder="Search modules..."
+            className="border-2 border-gray-300 p-3 w-2/3 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+          />
+        </div>
+        <table className="w-full table-auto">
           <thead>
-            <tr className="bg-blue-100">
-              <th></th>
-              <th>Year</th>
-              <th>Semester</th>
-              <th>Module Code</th>
-              <th>Module Name</th>
-              <th>Actions</th>
+            <tr className="bg-indigo-100 text-gray-700">
+              <th className="py-3 px-6 text-left">Year</th>
+              <th className="py-3 px-6 text-left">Semester</th>
+              <th className="py-3 px-6 text-left">Module Code</th>
+              <th className="py-3 px-6 text-left">Module Name</th>
+              <th className="py-3 px-6 text-left">Actions</th>
             </tr>
           </thead>
           <tbody>
-            {modules.map((module, index) => (
-              <tr key={module._id} className="hover:bg-gray-100 transition duration-200">
-                <th>{index + 1}</th>
-                <td className="text-center">{module.year}</td>
-                <td className="text-center">{module.semester}</td>
-                <td className="text-center font-semibold text-gray-800">{module.moduleCode}</td>
-                <td className="text-center">{module.moduleName}</td>
-                <td className="text-center flex justify-center space-x-2">
-                  <button onClick={() => handleEdit(module)} className="bg-blue-500 hover:bg-blue-700 text-white px-3 py-1 rounded-lg transition duration-300">Edit</button>
-                  <button onClick={() => handleDelete(module._id)} className="bg-red-500 hover:bg-red-700 text-white px-3 py-1 rounded-lg transition duration-300">Delete</button>
-                </td>
-              </tr>
-            ))}
+            {modules
+              .filter((module) =>
+                module.moduleName.toLowerCase().includes(search.toLowerCase())
+              )
+              .map((module) => (
+                <tr key={module._id} className="border-b hover:bg-gray-50">
+                  <td className="py-3 px-6">{module.year}</td>
+                  <td className="py-3 px-6">{module.semester}</td>
+                  <td className="py-3 px-6">{module.moduleCode}</td>
+                  <td className="py-3 px-6">{module.moduleName}</td>
+                  <td className="py-3 px-6">
+                    <button
+                      onClick={() => handleEdit(module)}
+                      className="btn btn-soft btn-primary px-4 py-2 rounded-md transition-colors mr-2"
+                    >
+                      Edit
+                    </button>
+                    <button
+                      onClick={() => handleDelete(module._id)}
+                      className="btn btn-soft btn-error px-4 py-2 rounded-md transition-colors"
+                    >
+                      Delete
+                    </button>
+                  </td>
+                </tr>
+              ))}
           </tbody>
         </table>
       </div>
