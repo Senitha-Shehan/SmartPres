@@ -6,6 +6,9 @@ const predefinedUsers = [
   { username: "lic", password: "lic123", role: "lic" },
   { username: "examiner", password: "examiner123", role: "examiner" },
   { username: "student", password: "student123", role: "student" },
+  { username: "johnsamuel", password: "john123", role: "examiner" }, // John as examiner
+  { username: "Pawan Dissanayake", password: "pawan123", role: "examiner" }, // Pawan as examiner
+  { username: "Saman Perera", password: "saman123", role: "examiner" }, // Saman as examiner
 ];
 
 const Login = () => {
@@ -45,7 +48,10 @@ const Login = () => {
             navigate("/Lic-Dashboard");
             break;
           case "examiner":
-            navigate("/Examiner-Dashboard");
+            // Pass username to the Examiner-Dashboard
+            navigate("/Examiner-Dashboard", {
+              state: { username: user.username },
+            });
             break;
           case "student":
             navigate("/student-dashboard");
@@ -66,7 +72,9 @@ const Login = () => {
       style={{ backgroundSize: "cover", backgroundPosition: "center" }}
     >
       <div className="bg-white p-8 rounded-lg shadow-lg max-w-md w-full">
-        <h2 className="text-3xl font-bold text-center text-gray-700 mb-6">Login</h2>
+        <h2 className="text-3xl font-bold text-center text-gray-700 mb-6">
+          Login
+        </h2>
         <form onSubmit={handleSubmit} className="space-y-6">
           <div className="flex flex-col">
             <label htmlFor="username" className="text-gray-600 text-sm mb-1">
@@ -78,7 +86,7 @@ const Login = () => {
               value={username}
               onChange={(e) => setUsername(e.target.value)}
               required
-              className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400"
+              className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-zinc-400"
               placeholder="Enter your username"
             />
           </div>
@@ -92,14 +100,14 @@ const Login = () => {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required
-              className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400"
+              className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:inset-ring-zinc-950-400"
               placeholder="Enter your password"
             />
           </div>
           {error && <p className="text-red-500 text-sm text-center">{error}</p>}
           <button
             type="submit"
-            className="w-full py-3 bg-blue-500 text-white font-semibold rounded-lg shadow-md hover:bg-blue-600 transition duration-300"
+            className="w-full py-3 btn btn-neutral text-white font-semibold rounded-lg shadow-md hover:bg-gray-600 transition duration-300"
           >
             Login
           </button>
@@ -107,7 +115,7 @@ const Login = () => {
       </div>
 
       {toastMessage && (
-        <div className="fixed bottom-5 left-1/2 transform -translate-x-1/2 bg-blue-500 text-white p-3 rounded-lg shadow-lg z-50 transition-all duration-300">
+        <div className="fixed bottom-5 left-1/2 transform -translate-x-1/2 bg-zinc-500 text-white p-3 rounded-lg shadow-lg z-50 transition-all duration-300">
           <p>{toastMessage}</p>
         </div>
       )}
