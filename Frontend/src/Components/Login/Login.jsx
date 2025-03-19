@@ -9,6 +9,8 @@ const predefinedUsers = [
   { username: "johnsamuel", password: "john123", role: "examiner" }, // John as examiner
   { username: "Pawan Dissanayake", password: "pawan123", role: "examiner" }, // Pawan as examiner
   { username: "Saman Perera", password: "saman123", role: "examiner" }, // Saman as examiner
+  { username: "IT22130716", password: "IT22130716", role: "student" }, // Student 1
+  { username: "IT22065094", password: "IT22065094", role: "student" }, // Student 2
 ];
 
 const Login = () => {
@@ -54,7 +56,10 @@ const Login = () => {
             });
             break;
           case "student":
-            navigate("/student-dashboard");
+            navigate("/student-dashboard",{
+              state: { username: user.username },
+            });
+            
             break;
           default:
             navigate("/");
