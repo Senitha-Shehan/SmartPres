@@ -1,4 +1,5 @@
-import React from 'react'
+import React from "react";
+import { Link } from "react-router-dom";
 
 const LicDashboard = () => {
   return (
@@ -12,7 +13,11 @@ const LicDashboard = () => {
             <p>Schedule Presentaion</p>
           </div>
           <div className="card-actions justify-end p-4">
-            <button className="btn btn-primary btn-soft">Schedule Presentaion</button>
+            <Link to="/PresentationSchedule">
+              <button className="btn btn-primary btn-soft">
+                Schedule Presentaion
+              </button>
+            </Link>
           </div>
         </div>
 
@@ -23,12 +28,14 @@ const LicDashboard = () => {
             <p>Report & _____</p>
           </div>
           <div className="card-actions justify-end p-4">
-            <button className="btn btn-secondary btn-soft">Report & _____</button>
+            <button className="btn btn-secondary btn-soft">
+              Report & _____
+            </button>
           </div>
         </div>
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default LicDashboard
+export default LicDashboard;

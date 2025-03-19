@@ -10,7 +10,12 @@ exports.createGroup = async (req, res) => {
             return res.status(400).json({ error: "All fields are required" });
         }
 
+        // Generate a unique groupId (you can modify the format as needed)
+        const groupId = `${moduleName}${year}${semester}${Math.floor(Math.random() * 10000)}`;
+
+        // Create new group instance
         const group = new Group({
+            groupId, // Use the generated groupId
             moduleName,
             year,
             semester,
@@ -19,6 +24,7 @@ exports.createGroup = async (req, res) => {
             members
         });
 
+        // Save the group to the database
         await group.save();
         res.status(201).json({ message: "Group registered successfully", group });
     } catch (error) {

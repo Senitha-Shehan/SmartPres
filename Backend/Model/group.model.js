@@ -1,6 +1,7 @@
 const mongoose = require("mongoose");
 
 const groupSchema = new mongoose.Schema({
+    groupId: { type: String, required: true, unique: true }, // Add this field
     moduleName: { type: String, required: true },
     year: { type: String, required: true },
     semester: { type: String, required: true },
@@ -12,6 +13,7 @@ const groupSchema = new mongoose.Schema({
             memberName: { type: String, required: true }
         }
     ]
-}, { timestamps: true }); // Optionally add timestamps to track when a group is created/modified
+}, { timestamps: true }); 
+
 
 module.exports = mongoose.model("Group", groupSchema);
