@@ -10,6 +10,9 @@ const presentationRoutes = require("./Route/presentationSchedule.route");
 const examinerRoutes = require("./Route/examiner.route");
 const moduleRoutes = require("./Route/model.route");
 const groupRoutes = require("./Route/group.route")
+const groupRoutes = require("./Route/group.route");
+const evaluationRoutes = require("./Route/evaluation.route");
+
 
 const app = express();
 app.use(cors());
@@ -22,6 +25,8 @@ app.use("/api/examiners", examinerRoutes);
 
 app.use("/api/modules", moduleRoutes);
 app.use("/api/groups", groupRoutes);
+
+app.use("/api/evaluation", evaluationRoutes);
 
 
 mongoose.connect(process.env.MONGO_URI)
