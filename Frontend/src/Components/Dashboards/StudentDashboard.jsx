@@ -1,8 +1,7 @@
 import React from "react";
-import { Link, useLocation, useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 
 const StudentDashboard = () => {
-
   const location = useLocation();
   const navigate = useNavigate();
   const { username } = location.state || {};
@@ -18,7 +17,12 @@ const StudentDashboard = () => {
             <p>Details about your upcoming presentation</p>
           </div>
           <div className="card-actions justify-end p-4">
-            <button className="btn btn-primary w-full btn-soft">
+            <button
+              onClick={() =>
+                navigate("/StudentPresentations", { state: { username } })
+              }
+              className="btn btn-primary w-full btn-soft"
+            >
               Upcoming Presentation
             </button>
           </div>
@@ -32,8 +36,11 @@ const StudentDashboard = () => {
           </div>
           <div className="card-actions justify-end p-4">
             <button
-            onClick={() => navigate("/GroupRegistration", { state: { username } })}
-            className="btn btn-secondary w-full btn-soft">
+              onClick={() =>
+                navigate("/GroupRegistration", { state: { username } })
+              }
+              className="btn btn-secondary w-full btn-soft"
+            >
               Group Registration
             </button>
           </div>

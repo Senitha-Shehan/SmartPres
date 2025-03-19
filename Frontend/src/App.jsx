@@ -12,6 +12,7 @@ import LicDashboard from "./Components/Dashboards/LicDashboard";
 import StudentDashboard from "./Components/Dashboards/StudentDashboard";
 import AddModules from "./Components/Modules&GroupManagement/AddModules";
 import GroupRegistration from "./Components/Modules&GroupManagement/GroupRegistration";
+import StudentPresentations from "./Components/PresentationScheduleManagement/StudentsPresentations";
 
 const App = () => {
   return (
@@ -35,6 +36,7 @@ const App = () => {
           <Route path="/student-dashboard" element={<StudentDashboard />} />
           <Route path="/AddModules" element={<AddModules />} />
           <Route path="/GroupRegistration" element={<GroupRegistration />} />
+          <Route path="/StudentPresentations" element={<StudentPresentations />} />
         </Routes>
       </main>
 
