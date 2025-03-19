@@ -3,7 +3,7 @@ const presentationSchedule = require("../Model/presentationSchedule.model");
 // Schedule a new presentation
 const createPresentation = async (req, res) => {
     try {
-        const { year, semester, module, examiner, date, duration } = req.body;
+        const { year, semester, module, examiner, date, duration, status } = req.body;
 
         const newPresentation = new presentationSchedule({
             year,
@@ -12,6 +12,7 @@ const createPresentation = async (req, res) => {
             examiner,
             date,
             duration,
+            status: status || "pending", // Default to "pending" if not provided
         });
 
         await newPresentation.save();
@@ -22,16 +23,25 @@ const createPresentation = async (req, res) => {
 };
 
 // Get all scheduled presentations
+// Get all scheduled presentations, filtered by examiner name if provided
 const getPresentations = async (req, res) => {
     try {
-        const presentations = await presentationSchedule.find();
+        const { examiner } = req.query; // Extract examiner name from query parameters
+
+        let query = {};
+        if (examiner) {
+            query.examiner = examiner; // If examiner is provided, filter presentations by examiner
+        }
+
+        const presentations = await presentationSchedule.find(query);
         res.status(200).json(presentations);
     } catch (error) {
         res.status(500).json({ error: "Failed to fetch presentations", details: error.message });
     }
 };
 
-// Update a presentation
+
+// Update a presentation (including status update)
 const updatePresentation = async (req, res) => {
     try {
         const updatedPresentation = await presentationSchedule.findByIdAndUpdate(
