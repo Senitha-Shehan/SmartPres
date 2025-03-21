@@ -1,26 +1,26 @@
 const express = require("express");
 const router = express.Router();
 const { 
-    addEvaluation, 
-    getAllEvaluations, 
-    getEvaluationsByExaminer, 
-    updateEvaluation, 
-    deleteEvaluation 
+  addEvaluation, 
+  getAllEvaluations, 
+  getEvaluationsByExaminer, 
+  updateEvaluation, 
+  deleteEvaluation 
 } = require("../Controllers/evaluation.controller");
 
 // Add an evaluation
-router.post("/add", addEvaluation);
+router.post("/", addEvaluation);
 
 // Get all evaluations
 router.get("/", getAllEvaluations);
 
 // Get evaluations by examiner
-router.get("/:examinerID", getEvaluationsByExaminer);
+router.get("/examiner/:examinerID", getEvaluationsByExaminer);
 
 // Update an evaluation
-router.put("/update/:id", updateEvaluation);
+router.put("/:id", updateEvaluation);
 
 // Delete an evaluation
-router.delete("/delete/:id", deleteEvaluation);
+router.delete("/:id", deleteEvaluation);
 
 module.exports = router;

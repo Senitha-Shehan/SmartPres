@@ -7,7 +7,7 @@ import ExaminerAdmin from "./Components/ExaminerManagement/ExaminersAdmin";
 import PresentationSchedule from "./Components/PresentationScheduleManagement/PresentationSchdule";
 
 import AdminDashboard from "./Components/Dashboards/AdminDashboard";
-import ExaminerDashboard from "./Components/Dashboards/ExaminerDashboard";
+import ExaminerPresentation from "./Components/ExaminerManagement/ExaminerPresentation";
 import LicDashboard from "./Components/Dashboards/LicDashboard";
 import StudentDashboard from "./Components/Dashboards/StudentDashboard";
 import AddModules from "./Components/Modules&GroupManagement/AddModules";
@@ -16,6 +16,9 @@ import StudentPresentations from "./Components/PresentationScheduleManagement/St
 import PresentationScheduleReport from "./Components/PresentationScheduleManagement/PresentationScheduleReport";
 
 import BGImg from './Pictures/BG.jpg';
+
+import ExaminerEvaluation from "./Components/Tracking&Evaluation/ExaminerEvaluation";
+import ExaminerDashboard from "./Components/Dashboards/ExaminerDashboard";
 
 const App = () => {
   return (
@@ -28,13 +31,15 @@ const App = () => {
           <Route path="/ExaminerAdmin" element={<ExaminerAdmin />} />
           <Route path="/PresentationSchedule" element={<PresentationSchedule />} />
           <Route path="/Admin-Dashboard" element={<AdminDashboard />} />
-          <Route path="/Examiner-Dashboard" element={<ExaminerDashboard />} />
+          <Route path="/ExaminerPresentation" element={<ExaminerPresentation />} />
           <Route path="/Lic-Dashboard" element={<LicDashboard />} />
           <Route path="/student-dashboard" element={<StudentDashboard />} />
           <Route path="/AddModules" element={<AddModules />} />
           <Route path="/GroupRegistration" element={<GroupRegistration />} />
           <Route path="/StudentPresentations" element={<StudentPresentations />} />
           <Route path="/PresentationScheduleReport" element={<PresentationScheduleReport />} />
+          <Route path="/Examiner-Dashboard" element={<ExaminerDashboard />} />
+          <Route path="/ExaminerEvaluation" element={<ExaminerEvaluation />} />
         </Routes>
       </main>
 

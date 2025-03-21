@@ -10,7 +10,6 @@ const presentationRoutes = require("./Route/presentationSchedule.route");
 const examinerRoutes = require("./Route/examiner.route");
 const moduleRoutes = require("./Route/model.route");
 const groupRoutes = require("./Route/group.route")
-const groupRoutes = require("./Route/group.route");
 const evaluationRoutes = require("./Route/evaluation.route");
 
 
