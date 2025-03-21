@@ -3,6 +3,8 @@ const Evaluation = require("../Model/evaluation.model");
 // Add Evaluation (Assign marks with remarks)
 const addEvaluation = async (req, res) => {
   try {
+    console.log("Received evaluation request:", req.body); // Debugging Log
+
     const { groupID, moduleName, examinerID, marks, remarks } = req.body;
 
     if (!groupID || !moduleName || !examinerID || marks == null) {
@@ -20,9 +22,11 @@ const addEvaluation = async (req, res) => {
     await newEvaluation.save();
     res.status(201).json({ message: "Evaluation saved successfully", newEvaluation });
   } catch (error) {
+    console.error("Error saving evaluation:", error); // Debugging Log
     res.status(500).json({ message: "Error saving evaluation", error: error.message });
   }
 };
+
 
 // Get all evaluations
 const getAllEvaluations = async (req, res) => {
