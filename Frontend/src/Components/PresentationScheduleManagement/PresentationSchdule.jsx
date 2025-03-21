@@ -17,6 +17,7 @@ const PresentationSchedule = () => {
   const [presentations, setPresentations] = useState([]);
   const [editId, setEditId] = useState(null);
   const [validDates, setValidDates] = useState([]);
+  const [searchTerm, setSearchTerm] = useState("");
 
   useEffect(() => {
     api.get("/api/modules")
@@ -44,9 +45,9 @@ const PresentationSchedule = () => {
 
   useEffect(() => {
     if (module) {
-      const filtered = examiners.filter(
-        (ex) => ex.module === modules.find((m) => m.moduleCode === module)?.moduleName
-      );
+      const filtered = examiners.filter((ex) =>
+        Array.isArray(ex.module) && ex.module.includes(modules.find((m) => m.moduleCode === module)?.moduleName)
+      );      
       setFilteredExaminers(filtered);
     } else {
       setFilteredExaminers([]);
@@ -111,7 +112,13 @@ const PresentationSchedule = () => {
       setMessage("Please fill all fields");
       return;
     }
-
+  
+    const durationValue = parseInt(duration);
+    if (durationValue < 10 || durationValue > 30) {
+      setMessage("Duration must be between 10 and 30 minutes");
+      return;
+    }
+  
     try {
       const moduleName = modules.find(
         (m) => m.moduleCode === module
@@ -122,10 +129,10 @@ const PresentationSchedule = () => {
         module: moduleName,
         examiner,
         date,
-        duration,
-        status: "pending", // Set status to pending by default
+        duration: durationValue,
+        status: "pending",
       };
-
+  
       if (editId) {
         await api.put(`/api/presentations/${editId}`, presentationData);
         setMessage("Presentation updated successfully");
@@ -133,7 +140,7 @@ const PresentationSchedule = () => {
         await api.post("/api/presentations/schedule", presentationData);
         setMessage("Presentation Scheduled Successfully");
       }
-
+  
       const res = await api.get("/api/presentations");
       setPresentations(res.data);
       setEditId(null);
@@ -148,6 +155,7 @@ const PresentationSchedule = () => {
       setMessage("Error scheduling presentation");
     }
   };
+  
 
   const handleEdit = (presentation) => {
     setYear(presentation.year);
@@ -175,7 +183,7 @@ const PresentationSchedule = () => {
   };
 
   return (
-    <div className="max-w-4xl mx-auto mt-10 p-8 bg-white shadow-lg rounded-lg border border-gray-300">
+    <div className="max-w-6xl mx-auto mt-10 p-8 bg-white shadow-lg rounded-lg border border-gray-300">
       <h2 className="text-3xl font-bold mb-6 text-center text-gray-900">Schedule Presentation</h2>
       {message && <p className="mb-4 text-center text-green-600 font-medium">{message}</p>}
       <form onSubmit={handleSubmit} className="space-y-4">
@@ -239,41 +247,83 @@ const PresentationSchedule = () => {
         >
           {editId ? "Update Presentation" : "Schedule Presentation"}
         </button>
+
       </form>
       <h3 className="text-2xl font-semibold mt-10 text-center">Scheduled Presentations</h3>
-      <div className="overflow-x-auto mt-6">
-        <table className="w-full table-auto border-collapse border border-gray-300 rounded-lg shadow-md">
-          <thead>
-            <tr className="bg-blue-100">
-              <th className="p-3 border-b">Year</th>
-              <th className="p-3 border-b">Semester</th>
-              <th className="p-3 border-b">Module</th>
-              <th className="p-3 border-b">Examiner</th>
-              <th className="p-3 border-b">Date</th>
-              <th className="p-3 border-b">Duration</th>
-              <th className="p-3 border-b">Status</th>
-              <th className="p-3 border-b">Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {presentations.map((presentation) => (
+      <div className="mb-4">
+          <input
+            type="text"
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            placeholder="Search by Module or Status"
+            className="w-full p-3 border rounded-lg bg-gray-100"
+          />
+        </div>
+    <div className="overflow-x-auto mt-6">
+      <table className="w-full table-auto border-collapse border border-gray-300 rounded-lg shadow-md">
+        <thead>
+          <tr className="bg-blue-100">
+            <th className="p-3 border-b text-center">Status</th>
+            <th className="p-3 border-b text-center">Year</th>
+            <th className="p-3 border-b text-center">Semester</th>
+            <th className="p-3 border-b text-center">Module</th>
+            <th className="p-3 border-b text-center">Examiner</th>
+            <th className="p-3 border-b text-center">Date</th>
+            <th className="p-3 border-b text-center">Duration</th>
+            <th className="p-3 border-b text-center">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+        {presentations
+          .filter((presentation) => {
+            const lowerSearchTerm = searchTerm.toLowerCase();
+            return (
+              presentation.module.toLowerCase().includes(lowerSearchTerm) ||
+              presentation.status.toLowerCase().includes(lowerSearchTerm)
+            );
+          })
+          .map((presentation) => {
+            let statusColor, statusDot;
+
+            switch (presentation.status.toLowerCase()) {
+              case "pending":
+                statusColor = "text-yellow-500";
+                statusDot = "🟡";
+                break;
+              case "approved":
+                statusColor = "text-green-500";
+                statusDot = "🟢";
+                break;
+              case "rejected":
+                statusColor = "text-red-500";
+                statusDot = "🔴";
+                break;
+              default:
+                statusColor = "text-gray-500";
+                statusDot = "⚪";
+            }
+            return (
               <tr key={presentation._id} className="hover:bg-gray-100 transition duration-200">
+                <td className="p-3 border-b text-center">
+                  <span className={`text-lg ${statusColor}`}>{statusDot}</span>
+                  <span className="ml-2 capitalize">{presentation.status}</span>
+                </td>
                 <td className="p-3 border-b text-center">{presentation.year}</td>
                 <td className="p-3 border-b text-center">{presentation.semester}</td>
                 <td className="p-3 border-b text-center">{presentation.module}</td>
                 <td className="p-3 border-b text-center">{presentation.examiner}</td>
-                <td className="p-3 border-b text-center">{presentation.date}</td>
+                <td className="p-3 border-b text-center">{new Date(presentation.date).toLocaleDateString()}</td>
                 <td className="p-3 border-b text-center">{presentation.duration} mins</td>
-                <td className="p-3 border-b text-center">{presentation.status}</td>
                 <td className="p-3 border-b text-center flex justify-center space-x-2">
-                  <button onClick={() => handleEdit(presentation)} className="bg-yellow-500 text-white p-2 rounded">Edit</button>
-                  <button onClick={() => handleDelete(presentation._id)} className="bg-red-500 text-white p-2 rounded">Delete</button>
+                  <button onClick={() => handleEdit(presentation)} className="bg-yellow-500 text-white p-2 rounded">Modify</button>
+                  <button onClick={() => handleDelete(presentation._id)} className="bg-red-500 text-white p-2 rounded">Cancel</button>
                 </td>
               </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
+            );
+          })}
+        </tbody>
+      </table>
+    </div>
     </div>
   );
 };

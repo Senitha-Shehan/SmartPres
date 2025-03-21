@@ -7,7 +7,7 @@ const StudentDashboard = () => {
   const { username } = location.state || {};
 
   return (
-    <div className="p-6 flex flex-col items-center min-h-screen bg-gray-100">
+    <div className="p-6 flex flex-col items-center ">
       <h1 className="text-2xl font-bold mb-6">Student Dashboard</h1>
       <div className="flex flex-col gap-6 w-full max-w-6xl items-center">
         {/* Upcoming Presentation Card */}

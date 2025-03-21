@@ -135,7 +135,7 @@ const GroupRegistration = () => {
   };
 
   return (
-    <div className="max-w-2xl mx-auto mt-10 p-6 bg-white shadow-lg rounded-lg">
+    <div className="max-w-6xl mx-auto mt-10 p-6 bg-white shadow-lg rounded-lg">
       <h1 className="text-3xl font-bold mb-6 text-center text-gray-900">Welcome, {username}!</h1>
       <h2 className="text-2xl font-bold mb-4">Group Registration</h2>
       {message && <p className="mb-4 text-red-600 font-medium">{message}</p>}
