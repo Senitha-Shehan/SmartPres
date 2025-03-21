@@ -33,8 +33,8 @@ const ExaminerEvaluation = () => {
 
   const loggedExaminer = examiners.find((examiner) => examiner.name === examinerUsername);
   const filteredGroups = loggedExaminer
-    ? groups.filter((group) => group.moduleName === loggedExaminer.module)
-    : [];
+  ? groups.filter((group) => loggedExaminer.module.includes(group.moduleName))
+  : [];
 
   const handleInputChange = (groupId, field, value) => {
     if (field === "marks" && (value < 0 || value > 100)) {
