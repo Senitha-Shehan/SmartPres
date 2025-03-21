@@ -104,6 +104,53 @@ const ExaminerEvaluation = () => {
     }
   }, [evaluations, loggedExaminer]);
 
+  const handleUpdateEvaluation = async (groupId) => {
+    const evaluation = evaluations[groupId];
+    if (!evaluation || evaluation.marks === undefined || evaluation.marks === "") {
+      alert("Please enter valid marks before updating.");
+      return;
+    }
+
+    try {
+      await axios.put("/api/evaluation", {
+        groupID: groupId,
+        marks: evaluation.marks,
+        remarks: evaluation.remarks || "",
+      });
+
+      setEvaluations((prev) => ({
+        ...prev,
+        [groupId]: { ...prev[groupId], submitted: false },
+      }));
+
+      alert("Evaluation updated successfully.");
+    } catch (error) {
+      alert("Error updating evaluation. Please try again.");
+    }
+  };
+
+  const handleDeleteEvaluation = async (groupId) => {
+    if (!window.confirm("Are you sure you want to delete this evaluation?")) return;
+
+    try {
+      await axios.delete(`/api/evaluation/${groupId}`);
+
+      setEvaluations((prev) => {
+        const updatedEvaluations = { ...prev };
+        delete updatedEvaluations[groupId];
+        return updatedEvaluations;
+      });
+
+      setSubmittedEvaluations((prev) =>
+        prev.filter((evalItem) => evalItem.groupID !== groupId)
+      );
+
+      alert("Evaluation deleted successfully.");
+    } catch (error) {
+      alert("Error deleting evaluation. Please try again.");
+    }
+  };
+
   return (
     <div className="container mx-auto p-8">
       <h2 className="text-3xl font-bold text-center mb-6 text-gray-800">Examiner Evaluation</h2>
@@ -176,13 +223,39 @@ const ExaminerEvaluation = () => {
 
           <div className="bg-white shadow-lg rounded-lg p-6">
             <h3 className="text-xl font-semibold text-gray-700 mb-4">Submitted Evaluations</h3>
-            <ul>
-              {submittedEvaluations.map((evalItem, index) => (
-                <li key={index} className="border-b py-2">
-                  Group ID: {evalItem.groupID} - Marks: {evalItem.marks} - Remarks: {evalItem.remarks}
-                </li>
-              ))}
-            </ul>
+            <table className="w-full table-auto border-collapse border border-gray-300">
+              <thead>
+                <tr className="bg-indigo-100 text-gray-700">
+                  <th className="py-3 px-6 border">Group ID</th>
+                  <th className="py-3 px-6 border">Marks</th>
+                  <th className="py-3 px-6 border">Remarks</th>
+                  <th className="py-3 px-6 border">Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {submittedEvaluations.map((evalItem, index) => (
+                  <tr key={index} className="border-b hover:bg-gray-50">
+                    <td className="py-3 px-6 border">{evalItem.groupID}</td>
+                    <td className="py-3 px-6 border">{evalItem.marks}</td>
+                    <td className="py-3 px-6 border">{evalItem.remarks}</td>
+                    <td className="py-3 px-6 border">
+                      <button
+                        onClick={() => handleUpdateEvaluation(evalItem.groupID)}
+                        className="ml-2 px-4 py-2 rounded-md bg-yellow-600 text-white hover:bg-yellow-700"
+                      >
+                        Update
+                      </button>
+                      <button
+                        onClick={() => handleDeleteEvaluation(evalItem.groupID)}
+                        className="ml-2 px-4 py-2 rounded-md bg-red-600 text-white hover:bg-red-700"
+                      >
+                        Delete
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
           </div>
         </>
       )}
