@@ -67,6 +67,8 @@ const GroupRegistration = () => {
 
   const validateForm = () => {
     let newErrors = {};
+  
+    // Basic form validation
     if (!formData.moduleName.trim()) newErrors.moduleName = "Module Name is required";
     if (!formData.year.trim()) newErrors.year = "Year is required";
     if (!formData.semester.trim()) newErrors.semester = "Semester is required";
@@ -77,21 +79,26 @@ const GroupRegistration = () => {
       if (!member.memberId.trim()) newErrors[`memberId${index}`] = "Member ID is required";
       if (!member.memberName.trim()) newErrors[`memberName${index}`] = "Member Name is required";
   
-      // Only check for duplicates within the same module
-      if (existingMembers.includes(member.memberId)) {
+      // Check if the member is already part of any other group for the same module
+      const memberInGroup = existingMembers.some(existingMember => 
+        existingMember.memberId === member.memberId && existingMember.moduleName === formData.moduleName
+      );
+      if (memberInGroup) {
         newErrors[`memberId${index}`] = "This IT number is already in another group for this module.";
       }
     });
   
-    // Check if the leader's IT number is already in another group for the same module
-    if (existingMembers.includes(formData.leaderId)) {
+    // Check if the leader is already part of another group for the same module
+    const leaderInGroup = existingMembers.some(existingMember => 
+      existingMember.memberId === formData.leaderId && existingMember.moduleName === formData.moduleName
+    );
+    if (leaderInGroup) {
       newErrors.leaderId = "This IT number is already a leader in another group for this module.";
     }
   
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
-  
 
   const handleChange = (e, index = null) => {
     const { name, value } = e.target;
@@ -106,8 +113,21 @@ const GroupRegistration = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+  
+    // Ensure the leader and members are not already registered in another group for this module
+    const memberIds = [formData.leaderId, ...formData.members.map((member) => member.memberId)];
 
-    // Prevent registering for the same module twice
+for (const memberId of memberIds) {
+  const isMemberInModule = existingMembers.some(
+    (existingMember) => existingMember.memberId === memberId && existingMember.moduleName === formData.moduleName
+  );
+  if (isMemberInModule) {
+    setMessage("❌ One or more members are already part of a group for this module.");
+    return;
+  }
+}
+
+// Prevent registering for the same module twice
     if (existingModulesForUser.includes(formData.moduleName)) {
       setMessage("❌ You are already registered for this module.");
       return;
@@ -133,6 +153,7 @@ const GroupRegistration = () => {
       setMessage(error.response?.data?.error || "❌ Error registering group");
     }
   };
+  
 
   return (
     <div className="max-w-6xl mx-auto mt-10 p-6 bg-white shadow-lg rounded-lg">
