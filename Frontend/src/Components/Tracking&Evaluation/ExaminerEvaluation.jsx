@@ -9,6 +9,7 @@ const ExaminerEvaluation = () => {
   const [groups, setGroups] = useState([]);
   const [examiners, setExaminers] = useState([]);
   const [evaluations, setEvaluations] = useState({});
+  const [submittedEvaluations, setSubmittedEvaluations] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [submitting, setSubmitting] = useState(false);
@@ -28,13 +29,33 @@ const ExaminerEvaluation = () => {
         setLoading(false);
       }
     };
+
+    const fetchSubmittedEvaluations = async () => {
+      try {
+        const response = await axios.get("/api/evaluation"); // Fetch evaluations from DB
+        setSubmittedEvaluations(response.data);
+        const newEvaluations = {};
+        response.data.forEach((evalItem) => {
+          newEvaluations[evalItem.groupID] = {
+            marks: evalItem.marks,
+            remarks: evalItem.remarks,
+            submitted: true,
+          };
+        });
+        setEvaluations(newEvaluations);
+      } catch (err) {
+        console.error("Error fetching submitted evaluations", err);
+      }
+    };
+
     fetchData();
+    fetchSubmittedEvaluations(); // Load submitted evaluations on mount
   }, []);
 
   const loggedExaminer = examiners.find((examiner) => examiner.name === examinerUsername);
   const filteredGroups = loggedExaminer
-  ? groups.filter((group) => loggedExaminer.module.includes(group.moduleName))
-  : [];
+    ? groups.filter((group) => loggedExaminer.module.includes(group.moduleName))
+    : [];
 
   const handleInputChange = (groupId, field, value) => {
     if (field === "marks" && (value < 0 || value > 100)) {
@@ -59,14 +80,19 @@ const ExaminerEvaluation = () => {
 
     setSubmitting(true);
     try {
+      const moduleName = Array.isArray(loggedExaminer.module)
+        ? loggedExaminer.module.join(", ")
+        : loggedExaminer.module;
+
       await axios.post("/api/evaluation", {
         groupID: groupId,
-        moduleName: loggedExaminer.module,
+        moduleName,
         examinerID: loggedExaminer.examinerID,
         marks: evaluation.marks,
         remarks: evaluation.remarks || "",
       });
 
+      setSubmittedEvaluations((prev) => [...prev, { groupId, ...evaluation }]);
       setEvaluations((prev) => ({
         ...prev,
         [groupId]: { ...prev[groupId], submitted: true },
@@ -89,69 +115,76 @@ const ExaminerEvaluation = () => {
         <p className="text-center text-gray-500">Loading...</p>
       ) : error ? (
         <p className="text-center text-red-500">{error}</p>
-      ) : filteredGroups.length === 0 ? (
-        <p className="text-center text-gray-500">No groups assigned to this examiner.</p>
       ) : (
-        <div className="bg-white shadow-lg rounded-lg p-6">
-          <h3 className="text-xl font-semibold text-gray-700 mb-4">Assigned Groups</h3>
-          <table className="w-full table-auto border-collapse border border-gray-300">
-            <thead>
-              <tr className="bg-indigo-100 text-gray-700">
-                <th className="py-3 px-6 border border-gray-300 text-left">Group ID</th>
-                <th className="py-3 px-6 border border-gray-300 text-left">Module</th>
-                <th className="py-3 px-6 border border-gray-300 text-left">Examiner ID</th>
-                <th className="py-3 px-6 border border-gray-300 text-left">Marks</th>
-                <th className="py-3 px-6 border border-gray-300 text-left">Remarks</th>
-                <th className="py-3 px-6 border border-gray-300 text-left">Action</th>
-              </tr>
-            </thead>
-            <tbody>
-              {filteredGroups.map((group) => {
-                const evaluation = evaluations[group.groupId] || {};
-                return (
-                  <tr key={group.groupId} className="border-b hover:bg-gray-50">
-                    <td className="py-3 px-6 border border-gray-300">{group.groupId}</td>
-                    <td className="py-3 px-6 border border-gray-300">{group.moduleName}</td>
-                    <td className="py-3 px-6 border border-gray-300">{loggedExaminer?.examinerID || "N/A"}</td>
-                    <td className="py-3 px-6 border border-gray-300">
-                      <input
-                        type="number"
-                        value={evaluation.marks || ""}
-                        onChange={(e) => handleInputChange(group.groupId, "marks", e.target.value)}
-                        className="px-4 py-2 border rounded-md"
-                        min="0"
-                        max="100"
-                        disabled={evaluation.submitted}
-                      />
-                    </td>
-                    <td className="py-3 px-6 border border-gray-300">
-                      <input
-                        type="text"
-                        value={evaluation.remarks || ""}
-                        onChange={(e) => handleInputChange(group.groupId, "remarks", e.target.value)}
-                        className="px-4 py-2 border rounded-md"
-                        disabled={evaluation.submitted}
-                      />
-                    </td>
-                    <td className="py-3 px-6 border border-gray-300">
-                      <button
-                        onClick={() => handleSubmitEvaluation(group.groupId)}
-                        className={`px-4 py-2 rounded-md text-white transition ${
-                          evaluation.submitted
-                            ? "bg-gray-400 cursor-not-allowed"
-                            : "bg-indigo-600 hover:bg-indigo-700"
-                        }`}
-                        disabled={evaluation.submitted || submitting}
-                      >
-                        {evaluation.submitted ? "Submitted ✅" : "Submit"}
-                      </button>
-                    </td>
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
-        </div>
+        <>
+          <div className="bg-white shadow-lg rounded-lg p-6 mb-6">
+            <h3 className="text-xl font-semibold text-gray-700 mb-4">Assigned Groups</h3>
+            <table className="w-full table-auto border-collapse border border-gray-300">
+              <thead>
+                <tr className="bg-indigo-100 text-gray-700">
+                  <th className="py-3 px-6 border">Group ID</th>
+                  <th className="py-3 px-6 border">Module</th>
+                  <th className="py-3 px-6 border">Marks</th>
+                  <th className="py-3 px-6 border">Remarks</th>
+                  <th className="py-3 px-6 border">Action</th>
+                </tr>
+              </thead>
+              <tbody>
+                {filteredGroups.map((group) => {
+                  const evaluation = evaluations[group.groupId] || {};
+                  return (
+                    <tr key={group.groupId} className="border-b hover:bg-gray-50">
+                      <td className="py-3 px-6 border">{group.groupId}</td>
+                      <td className="py-3 px-6 border">{group.moduleName}</td>
+                      <td className="py-3 px-6 border">
+                        <input
+                          type="number"
+                          value={evaluation.marks || ""}
+                          onChange={(e) => handleInputChange(group.groupId, "marks", e.target.value)}
+                          className="px-4 py-2 border rounded-md"
+                          min="0"
+                          max="100"
+                          disabled={evaluation.submitted}
+                        />
+                      </td>
+                      <td className="py-3 px-6 border">
+                        <input
+                          type="text"
+                          value={evaluation.remarks || ""}
+                          onChange={(e) => handleInputChange(group.groupId, "remarks", e.target.value)}
+                          className="px-4 py-2 border rounded-md"
+                          disabled={evaluation.submitted}
+                        />
+                      </td>
+                      <td className="py-3 px-6 border">
+                        <button
+                          onClick={() => handleSubmitEvaluation(group.groupId)}
+                          className={`px-4 py-2 rounded-md text-white transition ${
+                            evaluation.submitted ? "bg-gray-400 cursor-not-allowed" : "bg-indigo-600 hover:bg-indigo-700"
+                          }`}
+                          disabled={evaluation.submitted || submitting}
+                        >
+                          {evaluation.submitted ? "Submitted ✅" : "Submit"}
+                        </button>
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+
+          <div className="bg-white shadow-lg rounded-lg p-6">
+            <h3 className="text-xl font-semibold text-gray-700 mb-4">Submitted Evaluations</h3>
+            <ul>
+              {submittedEvaluations.map((evalItem, index) => (
+                <li key={index} className="border-b py-2">
+                  Group ID: {evalItem.groupID} - Marks: {evalItem.marks} - Remarks: {evalItem.remarks}
+                </li>
+              ))}
+            </ul>
+          </div>
+        </>
       )}
     </div>
   );
