@@ -80,3 +80,24 @@ exports.deleteGroup = async (req, res) => {
         res.status(500).json({ error: error.message });
     }
 };
+
+// Get Group by Student IT Number (updated for multiple groups)
+exports.getGroupByStudentId = async (req, res) => {
+    try {
+        const { studentId } = req.params;
+        
+        // Find all groups where the student is either the leader or a member
+        const groups = await Group.find({
+            $or: [{ leaderId: studentId }, { "members.memberId": studentId }]
+        });
+
+        if (groups.length === 0) {
+            return res.status(404).json({ error: "No groups found for this student" });
+        }
+
+        res.status(200).json(groups);  // Return all groups the student is part of
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+};
+

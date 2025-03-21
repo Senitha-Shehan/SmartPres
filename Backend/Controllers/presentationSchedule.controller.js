@@ -75,9 +75,28 @@ const deletePresentation = async (req, res) => {
     }
 };
 
+const getPresentationsByModule = async (req, res) => {
+    try {
+        const { moduleName } = req.params;
+        
+        const presentations = await presentationSchedule.find({ module: moduleName });
+
+        if (presentations.length === 0) {
+            return res.status(404).json({ error: "No scheduled presentations for this module" });
+        }
+
+        res.status(200).json(presentations);
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+};
+
+module.exports = { getPresentationsByModule };
+
 module.exports = {
     createPresentation,
     getPresentations,
     updatePresentation,
-    deletePresentation
+    deletePresentation,
+    getPresentationsByModule
 };
