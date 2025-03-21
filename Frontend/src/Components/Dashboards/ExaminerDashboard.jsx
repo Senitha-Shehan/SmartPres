@@ -7,7 +7,7 @@ const ExaminerDashboard = () => {
   const { username } = location.state || {}; // Retrieve username
 
   return (
-    <div className="min-h-screen bg-gray-50 flex flex-col items-center p-8">
+    <div className="p-4 flex flex-col items-center">
       <h1 className="text-5xl font-bold text-gray-900 mb-12">Examiner Dashboard</h1>
 
       <div className="flex flex-col gap-8 w-full max-w-lg">
