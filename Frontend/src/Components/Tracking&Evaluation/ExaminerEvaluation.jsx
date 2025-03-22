@@ -188,7 +188,7 @@ const ExaminerEvaluation = () => {
   };
 
   return (
-    <div className="container mx-auto p-8 bg-gradient-to-br from-gray-50 to-gray-100 min-h-screen">
+    <div className="container mx-auto p-8 bg-gradient-to-br from-gray-50 to-gray-100 min-h-screen rounded-2xl">
       <h2 className="text-4xl font-bold text-center mb-8 text-gray-900">
         Examiner Evaluation
       </h2>
@@ -290,13 +290,13 @@ const ExaminerEvaluation = () => {
                     <td className="py-4 px-6">
                       <button
                         onClick={() => openModal(evalItem)}
-                        className="px-4 py-2 rounded-lg bg-gradient-to-r from-yellow-500 to-yellow-600 hover:from-yellow-600 hover:to-yellow-700 text-white mr-2"
+                        className="btn btn-soft btn-primary px-4 py-2 rounded-md transition-colors mr-2"
                       >
                         Update
                       </button>
                       <button
                         onClick={() => handleDeleteEvaluation(evalItem.groupID)}
-                        className="px-4 py-2 rounded-lg bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white"
+                        className="btn btn-soft btn-error px-4 py-2 rounded-md transition-colors"
                       >
                         Delete
                       </button>
