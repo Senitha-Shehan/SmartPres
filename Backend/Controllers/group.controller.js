@@ -10,7 +10,12 @@ exports.createGroup = async (req, res) => {
             return res.status(400).json({ error: "All fields are required" });
         }
 
+        // Generate a unique groupId (you can modify the format as needed)
+        const groupId = `${moduleName}${year}${semester}${Math.floor(Math.random() * 10000)}`;
+
+        // Create new group instance
         const group = new Group({
+            groupId, // Use the generated groupId
             moduleName,
             year,
             semester,
@@ -19,6 +24,7 @@ exports.createGroup = async (req, res) => {
             members
         });
 
+        // Save the group to the database
         await group.save();
         res.status(201).json({ message: "Group registered successfully", group });
     } catch (error) {
@@ -74,3 +80,24 @@ exports.deleteGroup = async (req, res) => {
         res.status(500).json({ error: error.message });
     }
 };
+
+// Get Group by Student IT Number (updated for multiple groups)
+exports.getGroupByStudentId = async (req, res) => {
+    try {
+        const { studentId } = req.params;
+        
+        // Find all groups where the student is either the leader or a member
+        const groups = await Group.find({
+            $or: [{ leaderId: studentId }, { "members.memberId": studentId }]
+        });
+
+        if (groups.length === 0) {
+            return res.status(404).json({ error: "No groups found for this student" });
+        }
+
+        res.status(200).json(groups);  // Return all groups the student is part of
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+};
+
