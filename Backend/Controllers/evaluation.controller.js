@@ -22,11 +22,10 @@ const addEvaluation = async (req, res) => {
     await newEvaluation.save();
     res.status(201).json({ message: "Evaluation saved successfully", newEvaluation });
   } catch (error) {
-    console.error("Error saving evaluation:", error); // Debugging Log
+    console.error("Error saving evaluation:", error);
     res.status(500).json({ message: "Error saving evaluation", error: error.message });
   }
 };
-
 
 // Get all evaluations
 const getAllEvaluations = async (req, res) => {
@@ -54,20 +53,16 @@ const getEvaluationsByExaminer = async (req, res) => {
   }
 };
 
-// Update an evaluation (Change marks and remarks)
+// Update an evaluation
 const updateEvaluation = async (req, res) => {
   try {
     const { id } = req.params;
     const { marks, remarks } = req.body;
 
-    if (marks == null) {
-      return res.status(400).json({ message: "Marks field is required" });
-    }
-
     const updatedEvaluation = await Evaluation.findByIdAndUpdate(
       id,
       { marks, remarks },
-      { new: true, runValidators: true }
+      { new: true }
     );
 
     if (!updatedEvaluation) {
@@ -81,11 +76,11 @@ const updateEvaluation = async (req, res) => {
 };
 
 // Delete an evaluation
-// Delete an evaluation
 const deleteEvaluation = async (req, res) => {
   try {
-    const { id } = req.params; // id from URL parameter
-    const deletedEvaluation = await Evaluation.findByIdAndDelete(id);
+    const { id } = req.params;
+
+    const deletedEvaluation = await Evaluation.findOneAndDelete({ groupID: id });
 
     if (!deletedEvaluation) {
       return res.status(404).json({ message: "Evaluation not found" });
@@ -93,10 +88,15 @@ const deleteEvaluation = async (req, res) => {
 
     res.status(200).json({ message: "Evaluation deleted successfully" });
   } catch (error) {
+    console.error("Error deleting evaluation:", error);
     res.status(500).json({ message: "Error deleting evaluation", error: error.message });
   }
 };
 
-
-
-module.exports = { addEvaluation, getAllEvaluations, getEvaluationsByExaminer, updateEvaluation, deleteEvaluation };
+module.exports = {
+  addEvaluation,
+  getAllEvaluations,
+  getEvaluationsByExaminer,
+  updateEvaluation,
+  deleteEvaluation
+};
