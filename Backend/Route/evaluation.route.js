@@ -1,11 +1,11 @@
 const express = require("express");
 const router = express.Router();
-const { 
-  addEvaluation, 
-  getAllEvaluations, 
-  getEvaluationsByExaminer, 
-  updateEvaluation, 
-  deleteEvaluation 
+const {
+  addEvaluation,
+  getAllEvaluations,
+  getEvaluationsByExaminer,
+  updateEvaluation,
+  deleteEvaluation,
 } = require("../Controllers/evaluation.controller");
 
 // Add an evaluation
