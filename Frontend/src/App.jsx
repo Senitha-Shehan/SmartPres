@@ -15,6 +15,9 @@ import GroupRegistration from "./Components/Modules&GroupManagement/GroupRegistr
 import StudentPresentations from "./Components/PresentationScheduleManagement/StudentsPresentations";
 import PresentationScheduleReport from "./Components/PresentationScheduleManagement/PresentationScheduleReport";
 
+
+import EvaluationResults from "./Components/Tracking&Evaluation/EvaluationResults";
+
 import BGImg from './Pictures/BG.jpg';
 
 import ExaminerEvaluation from "./Components/Tracking&Evaluation/ExaminerEvaluation";
@@ -40,6 +43,7 @@ const App = () => {
           <Route path="/PresentationScheduleReport" element={<PresentationScheduleReport />} />
           <Route path="/Examiner-Dashboard" element={<ExaminerDashboard />} />
           <Route path="/ExaminerEvaluation" element={<ExaminerEvaluation />} />
+          <Route path="/EvaluationResults" element={<EvaluationResults />} />
         </Routes>
       </main>
 
