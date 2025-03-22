@@ -81,9 +81,10 @@ const updateEvaluation = async (req, res) => {
 };
 
 // Delete an evaluation
+// Delete an evaluation
 const deleteEvaluation = async (req, res) => {
   try {
-    const { id } = req.params;
+    const { id } = req.params; // id from URL parameter
     const deletedEvaluation = await Evaluation.findByIdAndDelete(id);
 
     if (!deletedEvaluation) {
@@ -95,5 +96,7 @@ const deleteEvaluation = async (req, res) => {
     res.status(500).json({ message: "Error deleting evaluation", error: error.message });
   }
 };
+
+
 
 module.exports = { addEvaluation, getAllEvaluations, getEvaluationsByExaminer, updateEvaluation, deleteEvaluation };
