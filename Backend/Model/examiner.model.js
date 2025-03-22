@@ -1,6 +1,5 @@
 const mongoose = require('mongoose');
 
-
 const examinerSchema = new mongoose.Schema({
   examinerID: {
     type: String,
@@ -12,7 +11,7 @@ const examinerSchema = new mongoose.Schema({
     required: true
   },
   module: {
-    type: String,
+    type: [String], // Changed from String to an array of Strings
     required: true
   },
   email: {
@@ -24,6 +23,4 @@ const examinerSchema = new mongoose.Schema({
 });
 
 const Examiner = mongoose.model('Examiner', examinerSchema);
-
-
 module.exports = Examiner;
