@@ -15,7 +15,7 @@ const AdminDashboard = () => {
           </div>
           <div className="mt-4">
             <Link to="/AddModules">
-              <button className="w-full bg-blue-600 text-white py-3 rounded-lg text-lg hover:bg-blue-700 transition duration-300">
+              <button className="w-full btn btn-soft btn-primary py-3 rounded-lg text-lg transition duration-300">
                 Manage Modules
               </button>
             </Link>
@@ -30,7 +30,7 @@ const AdminDashboard = () => {
           </div>
           <div className="mt-4">
             <Link to="/examineradmin">
-              <button className="w-full bg-green-600 text-white py-3 rounded-lg text-lg hover:bg-green-700 transition duration-300">
+              <button className="btn btn-soft btn-success w-full  py-3 rounded-lg text-lg transition duration-300">
                 Manage Examiner
               </button>
             </Link>
