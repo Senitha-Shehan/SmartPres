@@ -19,35 +19,40 @@ const GroupRegistration = () => {
   const [filteredModules, setFilteredModules] = useState([]);
   const [message, setMessage] = useState(""); // Message state
   const [errors, setErrors] = useState({}); // Validation errors
-  const [existingMembers, setExistingMembers] = useState([]); // Track existing members
+  const [existingMembers, setExistingMembers] = useState([]); // Track existing members with module names
   const [existingModulesForUser, setExistingModulesForUser] = useState([]); // Track the user's registered modules
   const [userModules, setUserModules] = useState([]); // Store full module details
 
   useEffect(() => {
     if (!username) return;
-  
+
     setFormData({ ...formData, leaderId: username });
-  
-    api.get("/api/groups")
+
+    api
+      .get("/api/groups")
       .then((res) => {
-        const allMembers = res.data.flatMap(group => [
-          group.leaderId, 
-          ...group.members.map(member => member.memberId)
+        // Extract all members with their module names
+        const allMembers = res.data.flatMap((group) => [
+          { memberId: group.leaderId, moduleName: group.moduleName }, // Include leader
+          ...group.members.map((member) => ({
+            memberId: member.memberId,
+            moduleName: group.moduleName,
+          })),
         ]);
         setExistingMembers(allMembers);
-  
+
         // Filter the groups where the logged-in user is the leader
-        const userGroups = res.data.filter(group => group.leaderId === username);
-  
-        setExistingModulesForUser(userGroups.map(group => group.moduleName)); // Keep only module names
-        setUserModules(userGroups);  // Store full module details
+        const userGroups = res.data.filter((group) => group.leaderId === username);
+
+        setExistingModulesForUser(userGroups.map((group) => group.moduleName)); // Keep only module names
+        setUserModules(userGroups); // Store full module details
       })
       .catch((err) => console.error("Error fetching groups", err));
   }, [username]);
-  
 
   useEffect(() => {
-    api.get("/api/modules")
+    api
+      .get("/api/modules")
       .then((res) => setModules(res.data))
       .catch((err) => console.error("Error fetching modules", err));
   }, []);
@@ -63,39 +68,61 @@ const GroupRegistration = () => {
     } else {
       setFilteredModules([]);
     }
-  }, [formData.year, formData.semester, modules]);  // Ensure the filter is updated when form data changes
+  }, [formData.year, formData.semester, modules]);
 
   const validateForm = () => {
     let newErrors = {};
-  
+
     // Basic form validation
     if (!formData.moduleName.trim()) newErrors.moduleName = "Module Name is required";
     if (!formData.year.trim()) newErrors.year = "Year is required";
     if (!formData.semester.trim()) newErrors.semester = "Semester is required";
     if (!formData.leaderId.trim()) newErrors.leaderId = "Leader ID is required";
     if (!formData.leaderName.trim()) newErrors.leaderName = "Leader Name is required";
-  
+
+    // Validate Leader Name format (letters and spaces only)
+    if (!/^[A-Za-z\s]+$/.test(formData.leaderName)) {
+      newErrors.leaderName = "Leader Name must contain only letters and spaces.";
+    }
+
     formData.members.forEach((member, index) => {
       if (!member.memberId.trim()) newErrors[`memberId${index}`] = "Member ID is required";
       if (!member.memberName.trim()) newErrors[`memberName${index}`] = "Member Name is required";
-  
+
+      // Validate Member Name format (letters and spaces only)
+      if (!/^[A-Za-z\s]+$/.test(member.memberName)) {
+        newErrors[`memberName${index}`] = "Member Name must contain only letters and spaces.";
+      }
+
+      // Check for duplicate member IDs within the group
+      const duplicateMember = formData.members.some(
+        (m, i) => m.memberId === member.memberId && i !== index
+      );
+      if (duplicateMember) {
+        newErrors[`memberId${index}`] = "Duplicate Member ID within the group.";
+      }
+
       // Check if the member is already part of any other group for the same module
-      const memberInGroup = existingMembers.some(existingMember => 
-        existingMember.memberId === member.memberId && existingMember.moduleName === formData.moduleName
+      const memberInGroup = existingMembers.some(
+        (existingMember) =>
+          existingMember.memberId === member.memberId &&
+          existingMember.moduleName === formData.moduleName
       );
       if (memberInGroup) {
         newErrors[`memberId${index}`] = "This IT number is already in another group for this module.";
       }
     });
-  
+
     // Check if the leader is already part of another group for the same module
-    const leaderInGroup = existingMembers.some(existingMember => 
-      existingMember.memberId === formData.leaderId && existingMember.moduleName === formData.moduleName
+    const leaderInGroup = existingMembers.some(
+      (existingMember) =>
+        existingMember.memberId === formData.leaderId &&
+        existingMember.moduleName === formData.moduleName
     );
     if (leaderInGroup) {
       newErrors.leaderId = "This IT number is already a leader in another group for this module.";
     }
-  
+
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -113,24 +140,25 @@ const GroupRegistration = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-  
-    // Ensure the leader and members are not already registered in another group for this module
-    const memberIds = [formData.leaderId, ...formData.members.map((member) => member.memberId)];
 
-for (const memberId of memberIds) {
-  const isMemberInModule = existingMembers.some(
-    (existingMember) => existingMember.memberId === memberId && existingMember.moduleName === formData.moduleName
-  );
-  if (isMemberInModule) {
-    setMessage("❌ One or more members are already part of a group for this module.");
-    return;
-  }
-}
-
-// Prevent registering for the same module twice
+    // Prevent registering for the same module twice
     if (existingModulesForUser.includes(formData.moduleName)) {
       setMessage("❌ You are already registered for this module.");
       return;
+    }
+
+    // Ensure the leader and members are not already registered in another group for this module
+    const memberIds = [formData.leaderId, ...formData.members.map((member) => member.memberId)];
+
+    for (const memberId of memberIds) {
+      const isMemberInModule = existingMembers.some(
+        (existingMember) =>
+          existingMember.memberId === memberId && existingMember.moduleName === formData.moduleName
+      );
+      if (isMemberInModule) {
+        setMessage("❌ One or more members are already part of a group for this module.");
+        return;
+      }
     }
 
     if (!validateForm()) return;
@@ -153,7 +181,6 @@ for (const memberId of memberIds) {
       setMessage(error.response?.data?.error || "❌ Error registering group");
     }
   };
-  
 
   return (
     <div className="max-w-6xl mx-auto mt-10 p-6 bg-white shadow-lg rounded-lg">
@@ -176,6 +203,7 @@ for (const memberId of memberIds) {
             </option>
           ))}
         </select>
+        {errors.year && <p className="text-red-600">{errors.year}</p>}
 
         <label className="block text-lg font-semibold mb-2">Semester</label>
         <select
@@ -191,6 +219,7 @@ for (const memberId of memberIds) {
             </option>
           ))}
         </select>
+        {errors.semester && <p className="text-red-600">{errors.semester}</p>}
 
         <label className="block text-lg font-semibold mb-2">Module Name</label>
         <select
@@ -206,6 +235,7 @@ for (const memberId of memberIds) {
             </option>
           ))}
         </select>
+        {errors.moduleName && <p className="text-red-600">{errors.moduleName}</p>}
 
         <label className="block text-lg font-semibold mb-2">Leader Information</label>
         <input
@@ -217,6 +247,7 @@ for (const memberId of memberIds) {
           className="w-full p-2 mb-2 border rounded"
           readOnly
         />
+        {errors.leaderId && <p className="text-red-600">{errors.leaderId}</p>}
         <input
           type="text"
           name="leaderName"
@@ -225,13 +256,22 @@ for (const memberId of memberIds) {
           onChange={handleChange}
           className="w-full p-2 mb-4 border rounded"
         />
+        {errors.leaderName && <p className="text-red-600">{errors.leaderName}</p>}
 
         <label className="block text-lg font-semibold mb-2">Number of Members</label>
         <input
           type="number"
           name="numberOfMembers"
           value={formData.numberOfMembers}
-          onChange={(e) => handleChange(e)}
+          onChange={(e) => {
+            const num = parseInt(e.target.value);
+            if (num >= 1 && num <= 4) {
+              const newMembers = Array(num)
+                .fill()
+                .map((_, i) => formData.members[i] || { memberId: "", memberName: "" });
+              setFormData({ ...formData, numberOfMembers: num, members: newMembers });
+            }
+          }}
           className="w-full p-2 mb-4 border rounded"
           min="1"
           max="4"
@@ -247,6 +287,9 @@ for (const memberId of memberIds) {
               onChange={(e) => handleChange(e, index)}
               className="w-full p-2 mb-1 border rounded"
             />
+            {errors[`memberId${index}`] && (
+              <p className="text-red-600">{errors[`memberId${index}`]}</p>
+            )}
             <input
               type="text"
               name="memberName"
@@ -255,39 +298,34 @@ for (const memberId of memberIds) {
               onChange={(e) => handleChange(e, index)}
               className="w-full p-2 border rounded"
             />
-            {errors[`memberId${index}`] && (
-              <p className="text-red-600">{errors[`memberId${index}`]}</p>
+            {errors[`memberName${index}`] && (
+              <p className="text-red-600">{errors[`memberName${index}`]}</p>
             )}
           </div>
         ))}
 
-        <button
-          type="submit"
-          className="w-full p-2 mt-4 bg-blue-500 text-white rounded"
-        >
+        <button type="submit" className="w-full p-2 mt-4 bg-blue-500 text-white rounded">
           Register Group
         </button>
       </form>
-      
-      {userModules.length > 0 && (
-  <div className="mb-6 p-4 bg-gray-100 rounded">
-    <h2 className="text-xl font-semibold mb-2 text-gray-800">Registered Modules</h2>
-    <div className="space-y-4">
-      {userModules.map((mod, index) => (
-        <div key={index} className="p-4 bg-white shadow rounded">
-          <h3 className="text-lg font-bold text-gray-900">{mod.moduleName}</h3>
-          <p className="text-sm text-gray-600"><strong>Module Code:</strong> {mod.moduleCode}</p>
-          <p className="text-sm text-gray-600"><strong>Year:</strong> {mod.year}</p>
-          <p className="text-sm text-gray-600"><strong>Semester:</strong> {mod.semester}</p>
-          <p className="text-sm text-gray-600"><strong>Group ID:</strong> {mod.groupId}</p>
-        </div>
-      ))}
-    </div>
-  </div>
-)}
 
+      {userModules.length > 0 && (
+        <div className="mb-6 p-4 bg-gray-100 rounded">
+          <h2 className="text-xl font-semibold mb-2 text-gray-800">Registered Modules</h2>
+          <div className="space-y-4">
+            {userModules.map((mod, index) => (
+              <div key={index} className="p-4 bg-white shadow rounded">
+                <h3 className="text-lg font-bold text-gray-900">{mod.moduleName}</h3>
+                <p className="text-sm text-gray-600"><strong>Module Code:</strong> {mod.moduleCode}</p>
+                <p className="text-sm text-gray-600"><strong>Year:</strong> {mod.year}</p>
+                <p className="text-sm text-gray-600"><strong>Semester:</strong> {mod.semester}</p>
+                <p className="text-sm text-gray-600"><strong>Group ID:</strong> {mod.groupId}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
     </div>
-    
   );
 };
 
