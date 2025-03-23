@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from "react";
 import api from "../../lib/axios";
 // import jsPDF from "jspdf";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 const AddModules = () => {
   const [formData, setFormData] = useState({
@@ -32,6 +34,7 @@ const AddModules = () => {
       setModules(response.data);
     } catch (error) {
       console.error("Error fetching modules", error);
+      toast.error("Failed to fetch modules. Please try again.");
     }
   };
 
@@ -82,8 +85,10 @@ const AddModules = () => {
     try {
       if (editId) {
         await api.put(`/api/modules/${editId}`, formData);
+        toast.success("Module updated successfully!");
       } else {
         await api.post("/api/modules", formData);
+        toast.success("Module added successfully!");
       }
       setFormData({ year: "", semester: "", moduleCode: "", moduleName: "" });
       setEditId(null);
@@ -91,6 +96,7 @@ const AddModules = () => {
       fetchModules();
     } catch (error) {
       console.error("Error saving module", error);
+      toast.error("Failed to save module. Please try again.");
     }
   };
 
@@ -102,36 +108,18 @@ const AddModules = () => {
   const handleDelete = async (id) => {
     try {
       await api.delete(`/api/modules/${id}`);
+      toast.success("Module deleted successfully!");
       fetchModules();
     } catch (error) {
       console.error("Error deleting module", error);
+      toast.error("Failed to delete module. Please try again.");
     }
   };
 
-  const generateReport = () => {
-    const doc = new jsPDF();
-    doc.setFontSize(18);
-    doc.text("Module List Report", 20, 20);
-    doc.setFontSize(12);
-    let yPosition = 30;
-
-    doc.text("Year | Semester | Module Code | Module Name", 20, yPosition);
-    yPosition += 10;
-
-    modules.forEach((module) => {
-      doc.text(
-        `${module.year} | ${module.semester} | ${module.moduleCode} | ${module.moduleName}`,
-        20,
-        yPosition
-      );
-      yPosition += 10;
-    });
-
-    doc.save("module_report.pdf");
-  };
 
   return (
-    <div className="container mx-auto p-8 bg-gradient-to-br from-gray-50 to-gray-100 min-h-screen rounded-2xl">
+    <div className="container p-8 bg-gradient-to-br from-gray-50 to-gray-100 min-h-screen rounded-2xl">
+      <ToastContainer />
       <h1 className="text-3xl font-bold text-center mb-6 text-gray-800">Module Management</h1>
 
       {/* Add/Edit Module Form */}
@@ -222,6 +210,7 @@ const AddModules = () => {
             value={search}
             onChange={(e) => setSearch(e.target.value)}
           />
+          
         </div>
         <table className="w-full table-auto">
           <thead>

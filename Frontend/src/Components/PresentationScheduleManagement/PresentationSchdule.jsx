@@ -21,18 +21,22 @@ const PresentationSchedule = () => {
   const [validDates, setValidDates] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
 
+  // Fetch modules and examiners on component mount
   useEffect(() => {
     api.get("/api/modules")
       .then((res) => setModules(res.data))
       .catch((err) => console.error("Error fetching modules", err));
-  }, []);
 
-  useEffect(() => {
     api.get("/api/examiners")
       .then((res) => setExaminers(res.data))
       .catch((err) => console.error("Error fetching examiners", err));
+
+    api.get("/api/presentations")
+      .then((res) => setPresentations(res.data))
+      .catch((err) => console.error("Error fetching presentations", err));
   }, []);
 
+  // Filter modules based on selected year and semester
   useEffect(() => {
     if (year && semester) {
       const filtered = modules.filter(
@@ -45,17 +49,24 @@ const PresentationSchedule = () => {
     }
   }, [year, semester, modules]);
 
+  // Filter examiners based on selected module
   useEffect(() => {
     if (module) {
-      const filtered = examiners.filter((ex) =>
-        Array.isArray(ex.module) && ex.module.includes(modules.find((m) => m.moduleCode === module)?.moduleName)
-      );      
-      setFilteredExaminers(filtered);
+      const selectedModule = modules.find((m) => m.moduleCode === module);
+      if (selectedModule) {
+        const filtered = examiners.filter((ex) =>
+          Array.isArray(ex.module) && ex.module.includes(selectedModule.moduleName)
+        );
+        setFilteredExaminers(filtered);
+      } else {
+        setFilteredExaminers([]);
+      }
     } else {
       setFilteredExaminers([]);
     }
   }, [module, examiners, modules]);
 
+  // Map days to numbers for timetable validation
   const dayMapping = {
     "Sunday": 0,
     "Monday": 1,
@@ -66,6 +77,7 @@ const PresentationSchedule = () => {
     "Saturday": 6
   };
 
+  // Generate valid dates based on selected module and timetable
   useEffect(() => {
     if (module) {
       const selectedModuleTimetable = timetable.find((t) => t.moduleCode === module);
@@ -92,7 +104,6 @@ const PresentationSchedule = () => {
           });
         }
 
-        console.log("Available Slots:", availableSlots);
         setValidDates(availableSlots);
       } else {
         setValidDates([]);
@@ -102,29 +113,39 @@ const PresentationSchedule = () => {
     }
   }, [module, timetable]);
 
-  useEffect(() => {
-    api.get("/api/presentations")
-      .then((res) => setPresentations(res.data))
-      .catch((err) => console.error("Error fetching presentations", err));
-  }, []);
-
+  // Handle form submission
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    // Validate required fields
     if (!year || !semester || !module || !date || !duration) {
       toast.error("Please fill all fields");
       return;
     }
-  
+
+    // Validate duration
     const durationValue = parseInt(duration);
     if (durationValue < 10 || durationValue > 30) {
       toast.error("Duration must be between 10 and 30 minutes");
       return;
     }
-  
+
+    // Get the module name from the module code
+    const moduleName = modules.find((m) => m.moduleCode === module)?.moduleName;
+
+    // Check if a presentation for the same module and date already exists
+    const isDuplicate = presentations.some(
+      (presentation) =>
+        presentation.module === moduleName &&
+        presentation.date === date
+    );
+
+    if (isDuplicate) {
+      toast.error("A presentation for this module on the same day already exists");
+      return;
+    }
+
     try {
-      const moduleName = modules.find(
-        (m) => m.moduleCode === module
-      )?.moduleName;
       const presentationData = {
         year,
         semester,
@@ -134,7 +155,7 @@ const PresentationSchedule = () => {
         duration: durationValue,
         status: "pending",
       };
-  
+
       if (editId) {
         await api.put(`/api/presentations/${editId}`, presentationData);
         toast.success("Presentation updated successfully");
@@ -142,9 +163,12 @@ const PresentationSchedule = () => {
         await api.post("/api/presentations/schedule", presentationData);
         toast.success("Presentation Scheduled Successfully");
       }
-  
+
+      // Refresh presentations after submission
       const res = await api.get("/api/presentations");
       setPresentations(res.data);
+
+      // Reset form fields
       setEditId(null);
       setYear("");
       setSemester("");
@@ -157,8 +181,8 @@ const PresentationSchedule = () => {
       toast.error("Error scheduling presentation");
     }
   };
-  
 
+  // Handle editing a presentation
   const handleEdit = (presentation) => {
     setYear(presentation.year);
     setSemester(presentation.semester);
@@ -172,11 +196,13 @@ const PresentationSchedule = () => {
     setEditId(presentation._id);
   };
 
+  // Handle deleting a presentation
   const handleDelete = async (id) => {
     try {
       await api.delete(`/api/presentations/${id}`);
       toast.success("Presentation deleted successfully");
 
+      // Refresh presentations after deletion
       const res = await api.get("/api/presentations");
       setPresentations(res.data);
     } catch (error) {
@@ -274,7 +300,7 @@ const PresentationSchedule = () => {
           {editId ? "Update Presentation" : "Schedule Presentation"}
         </button>
       </form>
-  
+
       <h3 className="text-2xl font-semibold text-gray-800 mt-10 mb-6 text-center">Scheduled Presentations</h3>
       <div className="mb-4">
         <input
@@ -310,7 +336,7 @@ const PresentationSchedule = () => {
               })
               .map((presentation) => {
                 let statusColor, statusDot;
-  
+
                 switch (presentation.status.toLowerCase()) {
                   case "pending":
                     statusColor = "text-yellow-500";
