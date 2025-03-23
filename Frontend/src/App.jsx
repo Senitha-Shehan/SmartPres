@@ -18,14 +18,14 @@ import PresentationScheduleReport from "./Components/PresentationScheduleManagem
 
 import EvaluationResults from "./Components/Tracking&Evaluation/EvaluationResults";
 
-import BGImg from './Pictures/BG.jpg';
+import BGI3mg from './Pictures/BG03.jpg';
 
 import ExaminerEvaluation from "./Components/Tracking&Evaluation/ExaminerEvaluation";
 import ExaminerDashboard from "./Components/Dashboards/ExaminerDashboard";
 
 const App = () => {
   return (
-    <div className="flex flex-col min-h-screen bg-cover bg-center" style={{ backgroundImage: `url(${BGImg})` }}>
+    <div className="flex flex-col min-h-screen bg-cover bg-center" style={{ backgroundImage: `url(${BGI3mg})` }}>
       <NavBar />
 
       <main className="flex-grow p-6">
