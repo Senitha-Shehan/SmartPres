@@ -122,15 +122,14 @@ const ExaminerEvaluation = () => {
     }
 
     try {
-      await axios.put("/api/evaluation", {
-        groupID: currentEvaluation.groupID,
+      await axios.put(`/api/evaluation/${currentEvaluation._id}`, {
         marks: currentEvaluation.marks,
         remarks: currentEvaluation.remarks || "",
       });
 
       setSubmittedEvaluations((prev) =>
         prev.map((evalItem) =>
-          evalItem.groupID === currentEvaluation.groupID
+          evalItem._id === currentEvaluation._id
             ? { ...evalItem, marks: currentEvaluation.marks, remarks: currentEvaluation.remarks }
             : evalItem
         )
@@ -172,7 +171,10 @@ const ExaminerEvaluation = () => {
   };
 
   const openModal = (evaluation) => {
-    setCurrentEvaluation(evaluation);
+    setCurrentEvaluation({
+      ...evaluation,
+      _id: evaluation._id, // Ensure the _id is passed correctly
+    });
     setIsModalOpen(true);
   };
 
@@ -186,11 +188,11 @@ const ExaminerEvaluation = () => {
   };
 
   return (
-    <div className="container mx-auto p-8">
-      <h2 className="text-3xl font-bold text-center mb-6 text-gray-800">
+    <div className="container mx-auto p-8 bg-gradient-to-br from-gray-50 to-gray-100 min-h-screen rounded-2xl">
+      <h2 className="text-4xl font-bold text-center mb-8 text-gray-900">
         Examiner Evaluation
       </h2>
-      <p className="text-center text-lg mb-4">
+      <p className="text-center text-lg mb-6 text-gray-700">
         Logged in as:{" "}
         <span className="font-semibold text-indigo-600">{examinerUsername}</span>
       </p>
@@ -201,58 +203,58 @@ const ExaminerEvaluation = () => {
         <p className="text-center text-red-500">{error}</p>
       ) : (
         <>
-          <div className="bg-white shadow-lg rounded-lg p-6 mb-6">
-            <h3 className="text-xl font-semibold text-gray-700 mb-4">
+          <div className="bg-white/80 backdrop-blur-lg shadow-2xl rounded-2xl p-8 mb-8">
+            <h3 className="text-2xl font-semibold text-gray-800 mb-6">
               Assigned Groups
             </h3>
-            <table className="w-full table-auto border-collapse border border-gray-300">
+            <table className="w-full table-auto border-collapse">
               <thead>
-                <tr className="bg-indigo-100 text-gray-700">
-                  <th className="py-3 px-6 border">Group ID</th>
-                  <th className="py-3 px-6 border">Module</th>
-                  <th className="py-3 px-6 border">Marks</th>
-                  <th className="py-3 px-6 border">Remarks</th>
-                  <th className="py-3 px-6 border">Action</th>
+                <tr className="bg-gradient-to-r from-[#000B58] to-indigo-800 text-white">
+                  <th className="py-4 px-6 text-left rounded-tl-2xl">Group ID</th>
+                  <th className="py-4 px-6 text-left">Module</th>
+                  <th className="py-4 px-6 text-left">Marks</th>
+                  <th className="py-4 px-6 text-left">Remarks</th>
+                  <th className="py-4 px-6 text-left rounded-tr-2xl">Action</th>
                 </tr>
               </thead>
               <tbody>
                 {filteredGroups.map((group) => {
                   const evaluation = evaluations[group.groupId] || {};
                   return (
-                    <tr key={group.groupId} className="border-b hover:bg-gray-50">
-                      <td className="py-3 px-6 border">{group.groupId}</td>
-                      <td className="py-3 px-6 border">{group.moduleName}</td>
-                      <td className="py-3 px-6 border">
+                    <tr key={group.groupId} className="border-b hover:bg-gray-50/50 transition-colors">
+                      <td className="py-4 px-6">{group.groupId}</td>
+                      <td className="py-4 px-6">{group.moduleName}</td>
+                      <td className="py-4 px-6">
                         <input
                           type="number"
                           value={evaluation.marks || ""}
                           onChange={(e) =>
                             handleInputChange(group.groupId, "marks", e.target.value)
                           }
-                          className="px-4 py-2 border rounded-md"
+                          className="w-20 px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
                           min="0"
                           max="100"
                           disabled={evaluation.submitted}
                         />
                       </td>
-                      <td className="py-3 px-6 border">
+                      <td className="py-4 px-6">
                         <input
                           type="text"
                           value={evaluation.remarks || ""}
                           onChange={(e) =>
                             handleInputChange(group.groupId, "remarks", e.target.value)
                           }
-                          className="px-4 py-2 border rounded-md"
+                          className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
                           disabled={evaluation.submitted}
                         />
                       </td>
-                      <td className="py-3 px-6 border">
+                      <td className="py-4 px-6">
                         <button
                           onClick={() => handleSubmitEvaluation(group.groupId)}
-                          className={`px-4 py-2 rounded-md text-white transition ${
+                          className={`px-4 py-2 rounded-lg text-white transition ${
                             evaluation.submitted
                               ? "bg-gray-400 cursor-not-allowed"
-                              : "bg-indigo-600 hover:bg-indigo-700"
+                              : "bg-gradient-to-r from-indigo-600 to-indigo-700 hover:from-indigo-700 hover:to-indigo-800"
                           }`}
                           disabled={evaluation.submitted || submitting}
                         >
@@ -266,35 +268,35 @@ const ExaminerEvaluation = () => {
             </table>
           </div>
 
-          <div className="bg-white shadow-lg rounded-lg p-6">
-            <h3 className="text-xl font-semibold text-gray-700 mb-4">
+          <div className="bg-white/80 backdrop-blur-lg shadow-2xl rounded-2xl p-8">
+            <h3 className="text-2xl font-semibold text-gray-800 mb-6">
               Submitted Evaluations
             </h3>
-            <table className="w-full table-auto border-collapse border border-gray-300">
+            <table className="w-full table-auto border-collapse">
               <thead>
-                <tr className="bg-indigo-100 text-gray-700">
-                  <th className="py-3 px-6 border">Group ID</th>
-                  <th className="py-3 px-6 border">Marks</th>
-                  <th className="py-3 px-6 border">Remarks</th>
-                  <th className="py-3 px-6 border">Actions</th>
+                <tr className="bg-gradient-to-r from-[#000B58] to-indigo-800 text-white">
+                  <th className="py-4 px-6 text-left rounded-tl-2xl">Group ID</th>
+                  <th className="py-4 px-6 text-left">Marks</th>
+                  <th className="py-4 px-6 text-left">Remarks</th>
+                  <th className="py-4 px-6 text-left rounded-tr-2xl">Actions</th>
                 </tr>
               </thead>
               <tbody>
                 {submittedEvaluations.map((evalItem, index) => (
-                  <tr key={index} className="border-b hover:bg-gray-50">
-                    <td className="py-3 px-6 border">{evalItem.groupID}</td>
-                    <td className="py-3 px-6 border">{evalItem.marks}</td>
-                    <td className="py-3 px-6 border">{evalItem.remarks}</td>
-                    <td className="py-3 px-6 border">
+                  <tr key={index} className="border-b hover:bg-gray-50/50 transition-colors">
+                    <td className="py-4 px-6">{evalItem.groupID}</td>
+                    <td className="py-4 px-6">{evalItem.marks}</td>
+                    <td className="py-4 px-6">{evalItem.remarks}</td>
+                    <td className="py-4 px-6">
                       <button
                         onClick={() => openModal(evalItem)}
-                        className="ml-2 px-4 py-2 rounded-md bg-yellow-600 text-white hover:bg-yellow-700"
+                        className="btn btn-soft btn-primary px-4 py-2 rounded-md transition-colors mr-2"
                       >
                         Update
                       </button>
                       <button
                         onClick={() => handleDeleteEvaluation(evalItem.groupID)}
-                        className="ml-2 px-4 py-2 rounded-md bg-red-600 text-white hover:bg-red-700"
+                        className="btn btn-soft btn-error px-4 py-2 rounded-md transition-colors"
                       >
                         Delete
                       </button>
@@ -307,12 +309,12 @@ const ExaminerEvaluation = () => {
 
           {/* Modal for Update */}
           {isModalOpen && (
-            <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
-              <div className="bg-white p-6 rounded-lg w-96">
-                <h3 className="text-xl font-semibold text-gray-700 mb-4">
+            <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex justify-center items-center z-50">
+              <div className="bg-white/90 backdrop-blur-lg p-8 rounded-2xl w-96 shadow-2xl">
+                <h3 className="text-2xl font-semibold text-gray-800 mb-6">
                   Update Evaluation
                 </h3>
-                <div>
+                <div className="mb-4">
                   <label className="block text-sm text-gray-600 mb-2">Marks</label>
                   <input
                     type="number"
@@ -320,12 +322,12 @@ const ExaminerEvaluation = () => {
                     onChange={(e) =>
                       handleModalInputChange("marks", e.target.value)
                     }
-                    className="px-4 py-2 border rounded-md w-full"
+                    className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
                     min="0"
                     max="100"
                   />
                 </div>
-                <div className="mt-4">
+                <div className="mb-6">
                   <label className="block text-sm text-gray-600 mb-2">Remarks</label>
                   <input
                     type="text"
@@ -333,19 +335,19 @@ const ExaminerEvaluation = () => {
                     onChange={(e) =>
                       handleModalInputChange("remarks", e.target.value)
                     }
-                    className="px-4 py-2 border rounded-md w-full"
+                    className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
                   />
                 </div>
-                <div className="mt-6 flex justify-end space-x-4">
+                <div className="flex justify-end space-x-4">
                   <button
                     onClick={closeModal}
-                    className="px-4 py-2 rounded-md bg-gray-300 hover:bg-gray-400"
+                    className="px-4 py-2 rounded-lg bg-gray-300 hover:bg-gray-400"
                   >
                     Cancel
                   </button>
                   <button
                     onClick={handleUpdateEvaluation}
-                    className="px-4 py-2 rounded-md bg-indigo-600 text-white hover:bg-indigo-700"
+                    className="px-4 py-2 rounded-lg bg-gradient-to-r from-indigo-600 to-indigo-700 hover:from-indigo-700 hover:to-indigo-800 text-white"
                   >
                     Update
                   </button>

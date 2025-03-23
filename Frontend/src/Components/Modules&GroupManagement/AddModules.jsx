@@ -131,11 +131,11 @@ const AddModules = () => {
   };
 
   return (
-    <div className="container mx-auto p-8">
+    <div className="container mx-auto p-8 bg-gradient-to-br from-gray-50 to-gray-100 min-h-screen rounded-2xl">
       <h1 className="text-3xl font-bold text-center mb-6 text-gray-800">Module Management</h1>
 
       {/* Add/Edit Module Form */}
-      <div className="bg-white shadow-lg rounded-lg p-6 mb-8">
+      <div className="bg-white/80 backdrop-blur-lg shadow-2xl rounded-2xl p-6 mb-8">
         <h2 className="text-xl font-semibold text-gray-700 mb-4">Add or Edit Module</h2>
         <form onSubmit={handleSubmit} className="grid grid-cols-1 sm:grid-cols-2 gap-6">
           <select
@@ -212,7 +212,7 @@ const AddModules = () => {
       </div>
 
       {/* Module List */}
-      <div className="bg-white shadow-lg rounded-lg p-6">
+      <div className="bg-white/80 backdrop-blur-lg shadow-2xl rounded-2xl p-6">
         <h2 className="text-xl font-semibold text-gray-700 mb-4">Module List</h2>
         <div className="mb-4 flex items-center justify-between">
           <input
@@ -225,7 +225,7 @@ const AddModules = () => {
         </div>
         <table className="w-full table-auto">
           <thead>
-            <tr className="bg-indigo-100 text-gray-700">
+            <tr className="bg-gradient-to-r from-[#000B58] to-indigo-800 text-white">
               <th className="py-3 px-6 text-left">Year</th>
               <th className="py-3 px-6 text-left">Semester</th>
               <th className="py-3 px-6 text-left">Module Code</th>
@@ -249,13 +249,13 @@ const AddModules = () => {
                       onClick={() => handleEdit(module)}
                       className="btn btn-soft btn-primary px-4 py-2 rounded-md transition-colors mr-2"
                     >
-                      Edit
+                      Update
                     </button>
                     <button
                       onClick={() => handleDelete(module._id)}
                       className="btn btn-soft btn-error px-4 py-2 rounded-md transition-colors"
                     >
-                      Delete
+                      Remove
                     </button>
                   </td>
                 </tr>

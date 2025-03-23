@@ -315,8 +315,8 @@ const PresentationSchedule = () => {
                 <td className="p-3 border-b text-center">{new Date(presentation.date).toLocaleDateString()}</td>
                 <td className="p-3 border-b text-center">{presentation.duration} mins</td>
                 <td className="p-3 border-b text-center flex justify-center space-x-2">
-                  <button onClick={() => handleEdit(presentation)} className="bg-yellow-500 text-white p-2 rounded">Modify</button>
-                  <button onClick={() => handleDelete(presentation._id)} className="bg-red-500 text-white p-2 rounded">Cancel</button>
+                  <button onClick={() => handleEdit(presentation)} className="btn btn-soft btn-primary px-4 py-2 rounded-md transition-colors mr-2">Modify</button>
+                  <button onClick={() => handleDelete(presentation._id)} className="btn btn-soft btn-error px-4 py-2 rounded-md transition-colors">Cancel</button>
                 </td>
               </tr>
             );
