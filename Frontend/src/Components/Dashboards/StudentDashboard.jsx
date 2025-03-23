@@ -53,7 +53,12 @@ const StudentDashboard = () => {
             <p>View your evaluation results</p>
           </div>
           <div className="card-actions justify-end p-4">
-            <button className="btn btn-primary w-full btn-soft">
+          <button
+              onClick={() =>
+                navigate("/EvaluationResults", { state: { username } })
+              }
+              className="btn btn-primary w-full btn-soft"
+            >
               Evaluation Results
             </button>
           </div>
