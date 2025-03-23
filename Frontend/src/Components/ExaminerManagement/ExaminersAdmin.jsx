@@ -11,6 +11,7 @@ const Examiners = () => {
   const [examiners, setExaminers] = useState([]);
   const [editId, setEditId] = useState(null);
   const [search, setSearch] = useState("");
+  const [errors, setErrors] = useState({});
 
   useEffect(() => {
     fetchExaminers();
@@ -25,9 +26,56 @@ const Examiners = () => {
     }
   };
 
+  const validateForm = () => {
+    const newErrors = {};
+
+    // Examiner ID validation
+    if (!formData.examinerID.trim()) {
+      newErrors.examinerID = "Examiner ID is required.";
+    } else if (
+      examiners.some(
+        (examiner) =>
+          examiner.examinerID === formData.examinerID && examiner._id !== editId
+      )
+    ) {
+      newErrors.examinerID = "Examiner ID must be unique.";
+    }
+
+    // Name validation
+    if (!formData.name.trim()) {
+      newErrors.name = "Name is required.";
+    } else if (!/^[A-Za-z\s]+$/.test(formData.name)) {
+      newErrors.name = "Name can only contain letters and spaces.";
+    } else if (formData.name.trim().length < 3) {
+      newErrors.name = "Name must be at least 3 characters long.";
+    }
+
+    // Email validation
+    if (!formData.email.trim()) {
+      newErrors.email = "Email is required.";
+    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
+      newErrors.email = "Invalid email format.";
+    }
+
+    // Modules validation
+    if (!formData.module.length) {
+      newErrors.module = "At least one module is required.";
+    }
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0; // Return true if no errors
+  };
+
   const handleChange = (e) => {
     const { name, value } = e.target;
+
+    // Prevent non-letter characters in the name field
+    if (name === "name" && !/^[A-Za-z\s]*$/.test(value)) {
+      return; // Do not update the state if the input is invalid
+    }
+
     setFormData({ ...formData, [name]: value });
+    setErrors((prev) => ({ ...prev, [name]: "" })); // Clear error when user types
   };
 
   const handleModuleChange = (e) => {
@@ -36,10 +84,13 @@ const Examiners = () => {
       ...prev,
       module: value.split(",").map((m) => m.trim()), // Store as an array
     }));
+    setErrors((prev) => ({ ...prev, module: "" })); // Clear error when user types
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (!validateForm()) return; // Stop if validation fails
+
     try {
       if (editId) {
         await api.put(`/api/examiners/${editId}`, formData);
@@ -72,93 +123,102 @@ const Examiners = () => {
   };
 
   return (
-    <div className="container mx-auto p-8" style={{ backgroundColor: '#e7ecef' }}>
-      <h1 className="text-3xl font-bold text-center mb-6" style={{ color: '#1d3557' }}>
+    <div className="container mx-auto p-8 bg-gradient-to-br from-gray-50 to-gray-100 min-h-screen rounded-2xl">
+      <h1 className="text-4xl font-bold text-center mb-8 text-gray-900">
         Examiner Management
       </h1>
-  
+
       {/* Add/Edit Examiner Form */}
-      <div className="shadow-lg rounded-lg p-6 mb-8" style={{ backgroundColor: '#a8dadc' }}>
-        <h2 className="text-xl font-semibold mb-4" style={{ color: '#1d3557' }}>
+      <div className="bg-white/80 backdrop-blur-lg shadow-2xl rounded-2xl p-8 mb-8">
+        <h2 className="text-2xl font-semibold text-gray-800 mb-6">
           {editId ? "Edit Examiner" : "Add Examiner"}
         </h2>
-        <form
-          onSubmit={handleSubmit}
-          className="grid grid-cols-1 sm:grid-cols-2 gap-6"
-        >
-          <input
-            type="text"
-            name="examinerID"
-            value={formData.examinerID}
-            onChange={handleChange}
-            placeholder="Examiner ID"
-            className="border-2 border-gray-300 p-3 rounded-md focus:ring-2 focus:ring-457b9d"
-            style={{ backgroundColor: '#e7ecef', color: '#1d3557' }}
-            required
-          />
-          <input
-            type="text"
-            name="name"
-            value={formData.name}
-            onChange={handleChange}
-            placeholder="Name"
-            className="border-2 border-gray-300 p-3 rounded-md focus:ring-2 focus:ring-457b9d"
-            style={{ backgroundColor: '#e7ecef', color: '#1d3557' }}
-            required
-          />
-          <input
-            type="text"
-            name="email"
-            value={formData.email}
-            onChange={handleChange}
-            placeholder="Email"
-            className="border-2 border-gray-300 p-3 rounded-md focus:ring-2 focus:ring-457b9d"
-            style={{ backgroundColor: '#e7ecef', color: '#1d3557' }}
-            required
-          />
-          <input
-            type="text"
-            name="module"
-            value={formData.module}
-            onChange={handleModuleChange}
-            placeholder="Modules (comma-separated)"
-            className="border-2 border-gray-300 p-3 rounded-md focus:ring-2 focus:ring-457b9d"
-            style={{ backgroundColor: '#e7ecef', color: '#1d3557' }}
-            required
-          />
+        <form onSubmit={handleSubmit} className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+          <div>
+            <input
+              type="text"
+              name="examinerID"
+              value={formData.examinerID}
+              onChange={handleChange}
+              placeholder="Examiner ID"
+              className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              required
+            />
+            {errors.examinerID && (
+              <p className="text-red-500 text-sm mt-1">{errors.examinerID}</p>
+            )}
+          </div>
+          <div>
+            <input
+              type="text"
+              name="name"
+              value={formData.name}
+              onChange={handleChange}
+              placeholder="Name"
+              className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              required
+            />
+            {errors.name && (
+              <p className="text-red-500 text-sm mt-1">{errors.name}</p>
+            )}
+          </div>
+          <div>
+            <input
+              type="text"
+              name="email"
+              value={formData.email}
+              onChange={handleChange}
+              placeholder="Email"
+              className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              required
+            />
+            {errors.email && (
+              <p className="text-red-500 text-sm mt-1">{errors.email}</p>
+            )}
+          </div>
+          <div>
+            <input
+              type="text"
+              name="module"
+              value={formData.module}
+              onChange={handleModuleChange}
+              placeholder="Modules (comma-separated)"
+              className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              required
+            />
+            {errors.module && (
+              <p className="text-red-500 text-sm mt-1">{errors.module}</p>
+            )}
+          </div>
           <button
             type="submit"
-            className="px-4 py-2 rounded-md sm:col-span-2"
-            style={{ backgroundColor: '#457b9d', color: '#e7ecef' }}
+            className="sm:col-span-2 px-4 py-2 rounded-lg bg-gradient-to-r from-indigo-600 to-indigo-700 hover:from-indigo-700 hover:to-indigo-800 text-white"
           >
             {editId ? "Update Examiner" : "Add Examiner"}
           </button>
         </form>
       </div>
-  
+
       {/* Examiner List */}
-      <div className="shadow-lg rounded-lg p-6" style={{ backgroundColor: '#a8dadc' }}>
-        <h2 className="text-xl font-semibold mb-4" style={{ color: '#1d3557' }}>
-          Examiner List
-        </h2>
+      <div className="bg-white/80 backdrop-blur-lg shadow-2xl rounded-2xl p-8">
+        <h2 className="text-2xl font-semibold text-gray-800 mb-6">Examiner List</h2>
         <div className="mb-4 flex items-center justify-between">
           <input
             type="text"
             placeholder="Search examiners..."
-            className="border-2 border-gray-300 p-3 w-2/3 rounded-md focus:ring-2 focus:ring-457b9d"
-            style={{ backgroundColor: '#e7ecef', color: '#1d3557' }}
             value={search}
             onChange={(e) => setSearch(e.target.value)}
+            className="w-2/3 px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
           />
         </div>
-        <table className="w-full table-auto">
+        <table className="w-full table-auto border-collapse">
           <thead>
-            <tr style={{ backgroundColor: '#457b9d', color: '#e7ecef' }}>
-              <th className="py-3 px-6 text-left">Examiner ID</th>
-              <th className="py-3 px-6 text-left">Name</th>
-              <th className="py-3 px-6 text-left">Email</th>
-              <th className="py-3 px-6 text-left">Modules</th>
-              <th className="py-3 px-6 text-left">Actions</th>
+            <tr className="bg-gradient-to-r from-[#000B58] to-indigo-800 text-white">
+              <th className="py-4 px-6 text-left rounded-tl-2xl">Examiner ID</th>
+              <th className="py-4 px-6 text-left">Name</th>
+              <th className="py-4 px-6 text-left">Email</th>
+              <th className="py-4 px-6 text-left">Modules</th>
+              <th className="py-4 px-6 text-left rounded-tr-2xl">Actions</th>
             </tr>
           </thead>
           <tbody>
@@ -167,23 +227,21 @@ const Examiners = () => {
                 examiner.name.toLowerCase().includes(search.toLowerCase())
               )
               .map((examiner) => (
-                <tr key={examiner._id} className="border-b hover:bg-gray-50" style={{ color: '#1d3557' }}>
-                  <td className="py-3 px-6">{examiner.examinerID}</td>
-                  <td className="py-3 px-6">{examiner.name}</td>
-                  <td className="py-3 px-6">{examiner.email}</td>
-                  <td className="py-3 px-6">{examiner.module.join(", ")}</td>
-                  <td className="py-3 px-6">
+                <tr key={examiner._id} className="border-b hover:bg-gray-50/50 transition-colors">
+                  <td className="py-4 px-6">{examiner.examinerID}</td>
+                  <td className="py-4 px-6">{examiner.name}</td>
+                  <td className="py-4 px-6">{examiner.email}</td>
+                  <td className="py-4 px-6">{examiner.module.join(", ")}</td>
+                  <td className="py-4 px-6">
                     <button
                       onClick={() => handleEdit(examiner)}
-                      className="px-4 py-2 rounded-md transition-colors mr-2"
-                      style={{ backgroundColor: '#457b9d', color: '#e7ecef' }}
+                      className="px-4 py-2 rounded-lg bg-gradient-to-r from-indigo-600 to-indigo-700 hover:from-indigo-700 hover:to-indigo-800 text-white mr-2"
                     >
                       Edit
                     </button>
                     <button
                       onClick={() => handleDelete(examiner._id)}
-                      className="px-4 py-2 rounded-md transition-colors"
-                      style={{ backgroundColor: '#1d3557', color: '#e7ecef' }}
+                      className="px-4 py-2 rounded-lg bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white"
                     >
                       Delete
                     </button>
