@@ -116,35 +116,35 @@ const PresentationSchedule = () => {
   // Handle form submission
   const handleSubmit = async (e) => {
     e.preventDefault();
-
+  
     // Validate required fields
     if (!year || !semester || !module || !date || !duration) {
       toast.error("Please fill all fields");
       return;
     }
-
+  
     // Validate duration
     const durationValue = parseInt(duration);
     if (durationValue < 10 || durationValue > 30) {
       toast.error("Duration must be between 10 and 30 minutes");
       return;
     }
-
+  
     // Get the module name from the module code
     const moduleName = modules.find((m) => m.moduleCode === module)?.moduleName;
-
+  
     // Check if a presentation for the same module and date already exists
     const isDuplicate = presentations.some(
       (presentation) =>
         presentation.module === moduleName &&
-        presentation.date === date
+        new Date(presentation.date).toISOString().split("T")[0] === date
     );
-
+  
     if (isDuplicate) {
       toast.error("A presentation for this module on the same day already exists");
       return;
     }
-
+  
     try {
       const presentationData = {
         year,
@@ -155,7 +155,7 @@ const PresentationSchedule = () => {
         duration: durationValue,
         status: "pending",
       };
-
+  
       if (editId) {
         await api.put(`/api/presentations/${editId}`, presentationData);
         toast.success("Presentation updated successfully");
@@ -163,11 +163,11 @@ const PresentationSchedule = () => {
         await api.post("/api/presentations/schedule", presentationData);
         toast.success("Presentation Scheduled Successfully");
       }
-
+  
       // Refresh presentations after submission
       const res = await api.get("/api/presentations");
       setPresentations(res.data);
-
+  
       // Reset form fields
       setEditId(null);
       setYear("");
