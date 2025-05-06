@@ -23,6 +23,12 @@ import BGI3mg from './Pictures/BG03.jpg';
 import ExaminerEvaluation from "./Components/Tracking&Evaluation/ExaminerEvaluation";
 import ExaminerDashboard from "./Components/Dashboards/ExaminerDashboard";
 
+import ExaminerReport from "./Components/ExaminerManagement/ExaminerReport";
+import ModuleReport from "./Components/Modules&GroupManagement/ModuleReport"
+import EvaluationReport from "./Components/Tracking&Evaluation/EvaluationReport"
+
+import Unique from "./Components/Unique/Unique";
+
 const App = () => {
   return (
     <div className="flex flex-col min-h-screen bg-cover bg-center" style={{ backgroundImage: `url(${BGI3mg})` }}>
@@ -44,6 +50,13 @@ const App = () => {
           <Route path="/Examiner-Dashboard" element={<ExaminerDashboard />} />
           <Route path="/ExaminerEvaluation" element={<ExaminerEvaluation />} />
           <Route path="/EvaluationResults" element={<EvaluationResults />} />
+          <Route path="/ExaminerReport" element={<ExaminerReport />} />
+          <Route path="/ModuleReport" element={<ModuleReport />} />
+          <Route path="/EvaluationReport" element={<EvaluationReport />} />
+          
+          
+
+          <Route path="/Unique" element={<Unique />} />
         </Routes>
       </main>
 

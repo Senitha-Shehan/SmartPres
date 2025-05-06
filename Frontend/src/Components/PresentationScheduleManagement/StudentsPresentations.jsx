@@ -36,9 +36,11 @@ const StudentPresentation = () => {
             const allPresentations = [];
             for (let group of groups) {
                 const response = await api.get(`/api/presentations/module/${group.moduleName}`);
-                allPresentations.push(...response.data); // Combine presentations of all modules
+                // Filter presentations with status "approved"
+                const approvedPresentations = response.data.filter(presentation => presentation.status === "approved");
+                allPresentations.push(...approvedPresentations); // Combine approved presentations of all modules
             }
-            setPresentations(allPresentations); // Set all presentations
+            setPresentations(allPresentations); // Set all approved presentations
         } catch (error) {
             console.error("Error fetching presentations:", error.response?.data || error.message);
         }
@@ -57,9 +59,9 @@ const StudentPresentation = () => {
                             <div key={group.groupId} className="mb-8 bg-gray-50 p-6 rounded-lg shadow">
                                 <h3 className="text-xl font-semibold text-gray-800 mb-4">Module: {group.moduleName}</h3>
 
-                                {presentations.length > 0 ? (
+                                {presentations.filter(presentation => presentation.module === group.moduleName).length > 0 ? (
                                     <table className="w-full border-collapse shadow-md rounded-lg bg-white">
-                                        <thead className="bg-blue-600 text-white">
+                                        <thead className="bg-gradient-to-r from-[#000B58] to-indigo-800 text-white">
                                             <tr>
                                                 <th className="border-b-2 border-gray-300 p-3 text-left">Date</th>
                                                 <th className="border-b-2 border-gray-300 p-3 text-left">Examiner</th>
@@ -67,17 +69,19 @@ const StudentPresentation = () => {
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            {presentations.filter(presentation => presentation.module === group.moduleName).map((presentation) => (
-                                                <tr key={presentation._id} className="border-b border-gray-200 hover:bg-gray-100">
-                                                    <td className="p-3">{new Date(presentation.date).toLocaleDateString()}</td>
-                                                    <td className="p-3">{presentation.examiner}</td>
-                                                    <td className="p-3">{presentation.duration}</td>
-                                                </tr>
-                                            ))}
+                                            {presentations
+                                                .filter(presentation => presentation.module === group.moduleName)
+                                                .map((presentation) => (
+                                                    <tr key={presentation._id} className="border-b border-gray-200 hover:bg-gray-100">
+                                                        <td className="p-3">{new Date(presentation.date).toLocaleDateString()}</td>
+                                                        <td className="p-3">{presentation.examiner}</td>
+                                                        <td className="p-3">{presentation.duration}</td>
+                                                    </tr>
+                                                ))}
                                         </tbody>
                                     </table>
                                 ) : (
-                                    <p className="text-gray-700">No scheduled presentations for this module.</p>
+                                    <p className="text-gray-700">No approved presentations for this module.</p>
                                 )}
                             </div>
                         ))}

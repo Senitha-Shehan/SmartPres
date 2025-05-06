@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from "react";
 import api from "../../lib/axios";
-// import jsPDF from "jspdf";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import { Link } from "react-router-dom";
 
 const AddModules = () => {
   const [formData, setFormData] = useState({
@@ -251,6 +251,14 @@ const AddModules = () => {
               ))}
           </tbody>
         </table>
+        <Link to="/ModuleReport">
+            <button className="flex items-center justify-center px-6 py-3 bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white rounded-lg shadow-md transition-all duration-300 transform hover:scale-105">
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+              </svg>
+              Examiner Report
+            </button>
+        </Link>
       </div>
     </div>
   );

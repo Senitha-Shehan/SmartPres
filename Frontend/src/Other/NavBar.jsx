@@ -34,8 +34,8 @@ const Navbar = () => {
   ];
 
   const licMenu = [
-    { path: "/lic/dashboard", icon: "📚", label: "Schedule Presentaion" },
-    { path: "/lic/courses", icon: "📖", label: "Report & ______" },
+    { path: "/PresentationSchedule", icon: "📚", label: "Schedule Presentaion" },
+    { path: "/PresentationScheduleReport", icon: "📖", label: "Report" },
   ];
 
   const studentMenu = [
